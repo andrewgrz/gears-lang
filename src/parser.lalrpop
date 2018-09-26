@@ -1,0 +1,92 @@
+
+use ast::{ModStmt, Stmt, Arg, Expr, BinOp};
+use std::str::FromStr;
+
+grammar;
+
+Comma<T>: Vec<T> = {
+    <v:(<T> ",")*> <e:T?> => match e {
+        None=> v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
+
+SemiColon<T>: Vec<T> = {
+    <v:(<T> ";")*> <e:T?> => match e {
+        None=> v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
+
+pub Module = ModStmt*;
+
+ModStmt: Box<ModStmt> = {
+    <FunctionDef>,
+};
+
+FunctionDef: Box<ModStmt> = {
+    "def" <name: Name> "(" <args: Args> ")" <exprs: Block> => Box::new(ModStmt::Actor{<>})
+};
+
+
+Args = Comma<Arg>;
+Exprs = SemiColon<Expr>;
+Stmts = SemiColon<Statement>;
+
+Arg: Arg = {
+    <name: Name> => Arg::new(<>)
+};
+
+Block: Vec<Box<Stmt>> = {
+    "{" <stmts: Stmts> "}" => stmts
+};
+
+Assignment: Box<Stmt> = {
+    "let" <name: Name> "=" <expr: Expr> => Box::new(Stmt::Assignment{<>})
+}
+
+// These are the AST's that can be at a block level
+Statement: Box<Stmt> = {
+    <Assignment>,
+    <Expr> => Box::new(Stmt::Expr(<>)),
+}
+
+Expr: Expr = {
+    <Expr> <ExprOp> <Factor> => Expr::new_op(<>),
+    <Factor>,
+};
+
+ExprOp: BinOp = {
+    "+" => BinOp::Add,
+    "-" => BinOp::Sub,
+};
+
+Factor: Expr = {
+    Factor FactorOp Term => Expr::new_op(<>),
+    Term,
+};
+
+FactorOp: BinOp = {
+    "*" => BinOp::Mul,
+    "/" => BinOp::Div,
+};
+
+Term: Expr = {
+    Name => Expr::Variable(<>.to_string()),
+    Integer => Expr::Integer(<>),
+    "(" <Expr> ")"
+};
+
+Name: String = r"[_a-zA-Z][_a-zA-Z0-9]{0,}" => String::from_str(<>).unwrap();
+
+Integer: i64 = {
+    r"[0-9]+" => i64::from_str(<>).unwrap(),
+};
