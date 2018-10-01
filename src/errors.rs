@@ -4,6 +4,8 @@ use std::io;
 pub enum GearsError {
     RustIOError(io::Error),
     FunctionNotFound(String),
+    InternalCompilerError(String),
+    TypeError(String),
 }
 
 impl From<io::Error> for GearsError {
