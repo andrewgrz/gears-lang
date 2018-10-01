@@ -1,11 +1,11 @@
 
-extern crate gears;
+extern crate gears_lang;
 
 use std::fs::File;
 use std::io::prelude::*;
-use gears::compiler::compile_file;
-use gears::vm::execute_module;
-use gears::object::GearsObject;
+use gears_lang::compiler::compile_file;
+use gears_lang::vm::execute_module;
+use gears_lang::object::GearsObject;
 
 #[test]
 fn math() {

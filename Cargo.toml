@@ -1,5 +1,5 @@
 [package]
-name = "gears"
+name = "gears_lang"
 version = "0.1.0"
 authors = ["Andrew Grzeszczak <andrew.grzeszczak@blocksixanalytics.com>"]
 build = "build.rs" # LALRPOP preprocessing

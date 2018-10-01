@@ -1,6 +1,6 @@
 
-extern crate gears;
-use gears::parser;
+extern crate gears_lang;
+use gears_lang::parser;
 
 const FULL_GRAMMAR_EXAMPLE: &str = r#"
 def simple_math(a, b) {
