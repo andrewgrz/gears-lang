@@ -1,5 +1,5 @@
 
-use ast::{ModStmt, Stmt, Arg, Expr, BinOp};
+use ast::*;
 use std::str::FromStr;
 
 grammar;
@@ -26,14 +26,14 @@ SemiColon<T>: Vec<T> = {
     }
 };
 
-pub Module = ModStmt*;
+pub Module = ModStmtAst*;
 
-ModStmt: Box<ModStmt> = {
+ModStmtAst: Box<ModStmtAst> = {
     <FunctionDef>,
 };
 
-FunctionDef: Box<ModStmt> = {
-    "def" <name: Name> "(" <args: Args> ")" <exprs: Block> => Box::new(ModStmt::Actor{<>})
+FunctionDef: Box<ModStmtAst> = {
+    "def" <name: Name> "(" <args: Args> ")" <exprs: Block> => Box::new(ModStmtAst::Actor{<>})
 };
 
 
@@ -41,47 +41,47 @@ Args = Comma<Arg>;
 Exprs = SemiColon<Expr>;
 Stmts = SemiColon<Statement>;
 
-Arg: Arg = {
-    <name: Name> => Arg::new(<>)
+Arg: ArgAst = {
+    <name: Name> => ArgAst::new(<>)
 };
 
-Block: Vec<Box<Stmt>> = {
+Block: Vec<Box<StmtAst>> = {
     "{" <stmts: Stmts> "}" => stmts
 };
 
-Assignment: Box<Stmt> = {
-    "let" <name: Name> "=" <expr: Expr> => Box::new(Stmt::Assignment{<>})
+Assignment: Box<StmtAst> = {
+    "let" <name: Name> "=" <expr: Expr> => Box::new(StmtAst::Assignment{<>})
 }
 
 // These are the AST's that can be at a block level
-Statement: Box<Stmt> = {
+Statement: Box<StmtAst> = {
     <Assignment>,
-    <Expr> => Box::new(Stmt::Expr(<>)),
+    <Expr> => Box::new(StmtAst::Expr(<>)),
 }
 
-Expr: Expr = {
-    <Expr> <ExprOp> <Factor> => Expr::new_op(<>),
+Expr: ExprAst = {
+    <Expr> <ExprOp> <Factor> => ExprAst::new_op(<>),
     <Factor>,
 };
 
-ExprOp: BinOp = {
-    "+" => BinOp::Add,
-    "-" => BinOp::Sub,
+ExprOp: BinOpAst = {
+    "+" => BinOpAst::Add,
+    "-" => BinOpAst::Sub,
 };
 
-Factor: Expr = {
-    Factor FactorOp Term => Expr::new_op(<>),
+Factor: ExprAst = {
+    Factor FactorOp Term => ExprAst::new_op(<>),
     Term,
 };
 
-FactorOp: BinOp = {
-    "*" => BinOp::Mul,
-    "/" => BinOp::Div,
+FactorOp: BinOpAst = {
+    "*" => BinOpAst::Mul,
+    "/" => BinOpAst::Div,
 };
 
-Term: Expr = {
-    Name => Expr::Variable(<>.to_string()),
-    Integer => Expr::Integer(<>),
+Term: ExprAst = {
+    Name => ExprAst::Variable(<>.to_string()),
+    Integer => ExprAst::Integer(<>),
     "(" <Expr> ")"
 };
 

@@ -4,12 +4,12 @@ use std::fmt::Error;
 
 // Type Aliases
 type Name = String;
-type Args = Vec<Arg>;
-type Stmts = Vec<Box<Stmt>>;
+type Args = Vec<ArgAst>;
+type Stmts = Vec<Box<StmtAst>>;
 
 
 #[derive(Debug)]
-pub enum ModStmt {
+pub enum ModStmtAst {
     Actor {
         name: String,
         args: Args,
@@ -18,35 +18,35 @@ pub enum ModStmt {
 }
 
 #[derive(Debug)]
-pub enum Stmt {
-    Expr(Expr),
-    Assignment { name: String, expr: Expr },
+pub enum StmtAst {
+    Expr(ExprAst),
+    Assignment { name: String, expr: ExprAst },
 }
 
 #[derive(Debug)]
-pub struct Arg {
+pub struct ArgAst {
     name: Name,
 }
 
-impl Arg {
-    pub fn new(name: Name) -> Arg{
-        Arg {
+impl ArgAst {
+    pub fn new(name: Name) -> ArgAst {
+        ArgAst {
             name: name,
         }
     }
 }
 
 #[derive(Copy, Clone)]
-pub enum BinOp {
+pub enum BinOpAst {
     Mul,
     Div,
     Add,
     Sub,
 }
 
-impl Debug for BinOp {
+impl Debug for BinOpAst {
     fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
-        use self::BinOp::*;
+        use self::BinOpAst::*;
         match *self {
             Mul => write!(fmt, "*"),
             Div => write!(fmt, "/"),
@@ -56,21 +56,21 @@ impl Debug for BinOp {
     }
 }
 
-pub enum Expr {
+pub enum ExprAst {
     Integer(i64),
-    Op(Box<Expr>, BinOp, Box<Expr>),
+    Op(Box<ExprAst>, BinOpAst, Box<ExprAst>),
     Variable(String),
 }
 
-impl Expr {
-    pub fn new_op(left: Expr, op: BinOp, right: Expr) -> Expr {
-        Expr::Op(Box::new(left), op, Box::new(right))
+impl ExprAst {
+    pub fn new_op(left: ExprAst, op: BinOpAst, right: ExprAst) -> ExprAst {
+        ExprAst::Op(Box::new(left), op, Box::new(right))
     }
 }
 
-impl Debug for Expr {
+impl Debug for ExprAst {
     fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
-        use self::Expr::*;
+        use self::ExprAst::*;
         match *self {
             Integer(n) => write!(fmt, "{:?}", n),
             Variable(ref s) => write!(fmt, "{}", s),
