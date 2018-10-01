@@ -1,4 +1,3 @@
-
 pub type Opcodes = Vec<u8>;
 
 // Control Flow Opcodes

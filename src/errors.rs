@@ -1,9 +1,9 @@
-
 use std::io;
 
 #[derive(Debug)]
 pub enum GearsError {
-    RustIOError(io::Error)
+    RustIOError(io::Error),
+    FunctionNotFound(String),
 }
 
 impl From<io::Error> for GearsError {

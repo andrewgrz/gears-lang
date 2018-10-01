@@ -1,12 +1,11 @@
 use std::fmt::Debug;
-use std::fmt::Formatter;
 use std::fmt::Error;
+use std::fmt::Formatter;
 
 // Type Aliases
 type Name = String;
 type Args = Vec<ArgAst>;
 type Stmts = Vec<Box<StmtAst>>;
-
 
 #[derive(Debug)]
 pub enum ModStmtAst {
@@ -30,9 +29,7 @@ pub struct ArgAst {
 
 impl ArgAst {
     pub fn new(name: Name) -> ArgAst {
-        ArgAst {
-            name: name,
-        }
+        ArgAst { name: name }
     }
 }
 

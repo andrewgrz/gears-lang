@@ -1,9 +1,8 @@
-
+use errors::GearsError;
+use module::Module;
+use parser;
 use std::fs::File;
 use std::io::prelude::*;
-use module::Module;
-use errors::GearsError;
-use parser;
 
 /// Compile a gears file to a module
 pub fn compile_file(filename: &str) -> Result<Module, GearsError> {
