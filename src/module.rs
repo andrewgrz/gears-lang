@@ -1,6 +1,6 @@
+use errors::GearsError;
 use opcodes::Opcodes;
 use std::collections::HashMap;
-use errors::GearsError;
 
 /// Contains a compiled module
 pub struct Module {
@@ -19,7 +19,7 @@ impl Module {
     pub fn get_function(&self, name: &str) -> Result<&Function, GearsError> {
         match self.functions.get(&name.to_string()) {
             Some(v) => Ok(v),
-            None => Err(GearsError::FunctionNotFound(name.to_string()))
+            None => Err(GearsError::FunctionNotFound(name.to_string())),
         }
     }
 }
