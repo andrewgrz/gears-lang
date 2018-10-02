@@ -47,6 +47,7 @@ fn execute(function: &Function, module: &Module) -> GearsResult {
         match cur_instr {
             RETURN => return Ok(pop!()),
             BIN_ADD => bin_op!(add),
+            BIN_SUB => bin_op!(sub),
             _ => return Err(GearsError::InternalCompilerError(format!("Unexpected Opcode: {:?}", cur_instr))),
         }
     }

@@ -30,6 +30,18 @@ impl GearsObject {
         }
     }
 
+    pub fn sub(self, other: GearsObject) -> GearsResult {
+        use self::GearsObject::*;
+
+        match self {
+            Int(l) => match other {
+                Int(r) => Ok(Int(l - r)),
+                _ => Err(create_type_error("add", &self, &other)),
+            },
+            _ => Err(create_type_error("add", &self, &other)),
+        }
+    }
+
     pub fn get_type_str(&self) -> &str {
         use self::GearsObject::*;
 
