@@ -54,6 +54,8 @@ fn execute(function: &Function, module: &Module) -> GearsResult {
             RETURN => return Ok(pop!()),
             BIN_ADD => bin_op!(add),
             BIN_SUB => bin_op!(sub),
+            BIN_MUL => bin_op!(mul),
+            BIN_DIV => bin_op!(div),
             LOAD_CONST => {
                 advance!();
                 push!((*module.get_const(cur_instr as usize)).clone());
@@ -84,4 +86,55 @@ mod tests {
         let result = execute_function(&module, "simple_math");
         assert_eq!(result, Ok(GearsObject::Int(15)));
     }
+
+    #[test]
+    fn test_subtraction() {
+        let mut module_builder = ModuleBuilder::new("Test".to_string());
+
+        module_builder.start_function("simple_math".to_string());
+        module_builder.load_int(20);
+        module_builder.load_int(4);
+        module_builder.op_sub();
+        module_builder.load_int(5);
+        module_builder.op_sub();
+        module_builder.finish_function();
+
+        let module = module_builder.build();
+        let result = execute_function(&module, "simple_math");
+        assert_eq!(result, Ok(GearsObject::Int(11)));
+    }
+
+    #[test]
+    fn test_mul() {
+        let mut module_builder = ModuleBuilder::new("Test".to_string());
+
+        module_builder.start_function("simple_math".to_string());
+        module_builder.load_int(3);
+        module_builder.load_int(4);
+        module_builder.op_mul();
+        module_builder.load_int(5);
+        module_builder.op_mul();
+        module_builder.finish_function();
+
+        let module = module_builder.build();
+        let result = execute_function(&module, "simple_math");
+        assert_eq!(result, Ok(GearsObject::Int(60)));
+    }
+
+    #[test]
+    fn test_div() {
+        let mut module_builder = ModuleBuilder::new("Test".to_string());
+
+        module_builder.start_function("simple_math".to_string());
+        module_builder.load_int(50);
+        module_builder.load_int(5);
+        module_builder.op_div();
+        module_builder.load_int(5);
+        module_builder.op_div();
+        module_builder.finish_function();
+
+        let module = module_builder.build();
+        let result = execute_function(&module, "simple_math");
+        assert_eq!(result, Ok(GearsObject::Int(2)));
+    } 
 }
