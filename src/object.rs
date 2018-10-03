@@ -11,7 +11,7 @@ fn create_type_error(op: &str, left: &GearsObject, right: &GearsObject) -> Gears
     ))
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum GearsObject {
     Int(i64),
     None,
@@ -36,9 +36,33 @@ impl GearsObject {
         match self {
             Int(l) => match other {
                 Int(r) => Ok(Int(l - r)),
-                _ => Err(create_type_error("add", &self, &other)),
+                _ => Err(create_type_error("sub", &self, &other)),
             },
-            _ => Err(create_type_error("add", &self, &other)),
+            _ => Err(create_type_error("sub", &self, &other)),
+        }
+    }
+
+    pub fn mul(self, other: GearsObject) -> GearsResult {
+        use self::GearsObject::*;
+
+        match self {
+            Int(l) => match other {
+                Int(r) => Ok(Int(l * r)),
+                _ => Err(create_type_error("mul", &self, &other)),
+            },
+            _ => Err(create_type_error("mul", &self, &other)),
+        }
+    }
+
+    pub fn div(self, other: GearsObject) -> GearsResult {
+        use self::GearsObject::*;
+
+        match self {
+            Int(l) => match other {
+                Int(r) => Ok(Int(l / r)),
+                _ => Err(create_type_error("div", &self, &other)),
+            },
+            _ => Err(create_type_error("div", &self, &other)),
         }
     }
 
