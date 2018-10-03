@@ -121,6 +121,18 @@ impl ModuleBuilder {
     pub fn op_add(&mut self) {
         self.opcode(BIN_ADD);
     }
+
+    pub fn op_sub(&mut self) {
+        self.opcode(BIN_SUB);
+    }
+
+    pub fn op_mul(&mut self) {
+        self.opcode(BIN_MUL);
+    }
+
+    pub fn op_div(&mut self) {
+        self.opcode(BIN_DIV);
+    }
 }
 
 /// A compiled function
