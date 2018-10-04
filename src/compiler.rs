@@ -1,10 +1,10 @@
+use ast::ModStmtAst;
 use errors::GearsError;
 use module::{Module, ModuleBuilder};
-use ast::ModStmtAst;
-use symbol::SymbolTable;
 use parser;
 use std::fs::File;
 use std::io::prelude::*;
+use symbol::SymbolTable;
 
 /// Compile a gears file to a module
 pub fn compile_file(filename: &str) -> Result<Module, GearsError> {
@@ -27,7 +27,7 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
     // Add all the top level functions to the scope
     for mod_stmt in ast {
         match *mod_stmt {
-            ModStmtAst::FunctionDef { name, .. }=> {
+            ModStmtAst::FunctionDef { name, .. } => {
                 symbol_table.def_fn(name);
             }
         }
