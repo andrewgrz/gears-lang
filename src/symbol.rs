@@ -32,5 +32,8 @@ impl <'a> SymbolTable<'a> {
             None => panic!("Unable to pop the global scope"),
         }
     }
-}
 
+    pub fn def_fn(&mut self, name: String) {
+        self.symbols.insert(name, Symbol::Function);
+    }
+}

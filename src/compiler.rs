@@ -1,5 +1,7 @@
 use errors::GearsError;
-use module::Module;
+use module::{Module, ModuleBuilder};
+use ast::ModStmtAst;
+use symbol::SymbolTable;
 use parser;
 use std::fs::File;
 use std::io::prelude::*;
@@ -12,10 +14,24 @@ pub fn compile_file(filename: &str) -> Result<Module, GearsError> {
     compile_str(&contents, filename)
 }
 
-/// Compile a String to
+/// Compile a String to module
 pub fn compile_str(string: &str, name: &str) -> Result<Module, GearsError> {
-    let module = Module::new(String::from(name));
-    let module_ast = parser::ModuleParser::new().parse(string);
+    compile_ast(parser::ModuleParser::new().parse(string)?, name)
+}
 
-    Ok(module)
+/// Compiles AST to Module and Bytecode
+fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsError> {
+    let mut module_builder = ModuleBuilder::new(String::from(name));
+    let mut symbol_table = SymbolTable::new_global();
+
+    // Add all the top level functions to the scope
+    for mod_stmt in ast {
+        match *mod_stmt {
+            ModStmtAst::FunctionDef { name, .. }=> {
+                symbol_table.def_fn(name);
+            }
+        }
+    }
+
+    Ok(module_builder.build())
 }
