@@ -9,7 +9,7 @@ type Stmts = Vec<Box<StmtAst>>;
 
 #[derive(Debug)]
 pub enum ModStmtAst {
-    Actor {
+    FunctionDef {
         name: String,
         args: Args,
         exprs: Stmts,

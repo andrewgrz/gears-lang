@@ -33,7 +33,7 @@ ModStmtAst: Box<ModStmtAst> = {
 };
 
 FunctionDef: Box<ModStmtAst> = {
-    "def" <name: Name> "(" <args: Args> ")" <exprs: Block> => Box::new(ModStmtAst::Actor{<>})
+    "def" <name: Name> "(" <args: Args> ")" <exprs: Block> => Box::new(ModStmtAst::FunctionDef{<>})
 };
 
 
