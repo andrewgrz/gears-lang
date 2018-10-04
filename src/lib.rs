@@ -1,5 +1,8 @@
+extern crate lalrpop_util;
+
 mod ast;
 mod opcodes;
+mod symbol;
 
 pub mod compiler;
 pub mod errors;
