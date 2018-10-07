@@ -1,4 +1,3 @@
-
 extern crate gears_lang;
 
 use gears_lang::compiler::compile_file;

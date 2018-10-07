@@ -14,7 +14,7 @@ fn math() {
 
     // The result will be 12
     assert_eq!(
-        execute_function(&module.expect("Test"), "basic_math").unwrap(),
+        execute_function(&module.expect("Test"), "basic_math", vec![]).unwrap(),
         GearsObject::Int(4 + 3 * 5 - 42 / 6)
     );
 }

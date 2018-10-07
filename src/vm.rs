@@ -2,7 +2,6 @@
 use module::{Module, Function};
 use object::{GearsResult, GearsObject};
 use errors::GearsError;
-use std::ops::Index;
 use opcodes::*;
 
 /// Execute a function contained in a compiled module

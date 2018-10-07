@@ -24,7 +24,7 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
     let mut module_builder = ModuleBuilder::new(String::from(name));
     let mut symbol_table = SymbolTable::new_global();
 
-    // Add all the top level functions to the scope before parsing so we can 
+    // Add all the top level functions to the scope before parsing so we can
     // use them during parse as they will resolve
     for ref mod_stmt in &ast {
         match mod_stmt.as_ref() {
@@ -52,10 +52,14 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
     Ok(module_builder.build())
 }
 
-fn visit_stmt(stmt: &StmtAst, scope: &mut SymbolTable, mut module_builder: &mut ModuleBuilder) -> Result<(), GearsError> {
+fn visit_stmt(
+    stmt: &StmtAst,
+    scope: &mut SymbolTable,
+    mut module_builder: &mut ModuleBuilder,
+) -> Result<(), GearsError> {
     match stmt {
         StmtAst::Expr(e) => visit_expr(e, scope, module_builder)?,
-        StmtAst::Assignment{ name, expr } => { 
+        StmtAst::Assignment { name, expr } => {
             visit_expr(expr, scope, &mut module_builder)?;
             let index = scope.def_variable(name.clone());
             module_builder.store_fast(index);
@@ -63,9 +67,13 @@ fn visit_stmt(stmt: &StmtAst, scope: &mut SymbolTable, mut module_builder: &mut 
     }
 
     Ok(())
-} 
+}
 
-fn visit_expr(expr: &ExprAst, scope: &mut SymbolTable, mut module_builder: &mut ModuleBuilder) -> Result<(), GearsError>  {
+fn visit_expr(
+    expr: &ExprAst,
+    scope: &mut SymbolTable,
+    mut module_builder: &mut ModuleBuilder,
+) -> Result<(), GearsError> {
     match expr {
         ExprAst::Integer(e) => module_builder.load_int(*e),
         ExprAst::Op(left, op, right) => {
@@ -81,22 +89,24 @@ fn visit_expr(expr: &ExprAst, scope: &mut SymbolTable, mut module_builder: &mut 
         }
         ExprAst::Variable(name) => {
             let (maybe_symbol, is_global) = scope.resolve(name);
-            
+
             match maybe_symbol {
-                Some(symbol) => {
-                    match symbol.get_type() {
-                        &SymbolType::Function => return Err(GearsError::InternalCompilerError("Functions are callable yet".to_string())),
-                        &SymbolType::Variable => {
-                            if !is_global {
-                                module_builder.load_fast(*symbol.get_index());
-                            }
+                Some(symbol) => match symbol.get_type() {
+                    &SymbolType::Function => {
+                        return Err(GearsError::InternalCompilerError(
+                            "Functions are callable yet".to_string(),
+                        ))
+                    }
+                    &SymbolType::Variable => {
+                        if !is_global {
+                            module_builder.load_fast(*symbol.get_index());
                         }
                     }
                 },
                 None => return Err(GearsError::SymbolNotFound(name.clone())),
             }
-        } 
+        }
     }
 
     Ok(())
-} 
+}
