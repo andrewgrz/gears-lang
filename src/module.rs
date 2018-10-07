@@ -132,6 +132,16 @@ impl ModuleBuilder {
     pub fn op_div(&mut self) {
         self.opcode(BIN_DIV);
     }
+
+    pub fn store_fast(&mut self, index: u8) {
+        self.opcode(STORE_FAST);
+        self.opcode(index);
+    }
+
+    pub fn load_fast(&mut self, index: u8) {
+        self.opcode(LOAD_FAST);
+        self.opcode(index);
+    }
 }
 
 /// A compiled function
