@@ -8,6 +8,7 @@ pub enum GearsError {
     FunctionNotFound(String),
     InternalCompilerError(String),
     TypeError(String),
+    SymbolNotFound(String),
     ParseError { location: usize, message: String },
 }
 
