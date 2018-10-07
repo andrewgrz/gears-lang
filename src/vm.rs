@@ -5,7 +5,7 @@ use errors::GearsError;
 use opcodes::*;
 
 /// Execute a function contained in a compiled module
-pub fn execute_function(module: &Module, function: &str, mut args: Vec<GearsObject>) -> GearsResult {
+pub fn execute_function(module: &Module, function: &str, args: Vec<GearsObject>) -> GearsResult {
     let mod_fn = module.get_function(function)?;
 
     execute(&mod_fn, &module, args)
