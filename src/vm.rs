@@ -2,16 +2,17 @@
 use module::{Module, Function};
 use object::{GearsResult, GearsObject};
 use errors::GearsError;
+use std::ops::Index;
 use opcodes::*;
 
 /// Execute a function contained in a compiled module
-pub fn execute_function(module: &Module, function: &str) -> GearsResult {
+pub fn execute_function(module: &Module, function: &str, mut args: Vec<GearsObject>) -> GearsResult {
     let mod_fn = module.get_function(function)?;
 
-    execute(&mod_fn, &module)
+    execute(&mod_fn, &module, args)
 }
 
-fn execute(function: &Function, module: &Module) -> GearsResult {
+fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> GearsResult {
     let opcodes = function.get_opcodes();
     let mut cur_instr: u8;
     let mut ip: usize = 0;
@@ -56,6 +57,18 @@ fn execute(function: &Function, module: &Module) -> GearsResult {
             BIN_SUB => bin_op!(sub),
             BIN_MUL => bin_op!(mul),
             BIN_DIV => bin_op!(div),
+            LOAD_FAST => {
+                advance!();
+
+                match args.get(cur_instr as usize) {
+                    Some(e) => push!(e.clone()),
+                    None => return Err(GearsError::InternalCompilerError(format!("LOAD_FAST failed")))
+                }
+            }
+            STORE_FAST => {
+                advance!();
+                args.insert(cur_instr as usize, pop!());
+            }
             LOAD_CONST => {
                 advance!();
                 push!((*module.get_const(cur_instr as usize)).clone());
@@ -83,7 +96,7 @@ mod tests {
         module_builder.finish_function();
 
         let module = module_builder.build();
-        let result = execute_function(&module, "simple_math");
+        let result = execute_function(&module, "simple_math", Vec::new(),);
         assert_eq!(result, Ok(GearsObject::Int(15)));
     }
 
@@ -100,7 +113,7 @@ mod tests {
         module_builder.finish_function();
 
         let module = module_builder.build();
-        let result = execute_function(&module, "simple_math");
+        let result = execute_function(&module, "simple_math", Vec::new(),);
         assert_eq!(result, Ok(GearsObject::Int(11)));
     }
 
@@ -117,7 +130,7 @@ mod tests {
         module_builder.finish_function();
 
         let module = module_builder.build();
-        let result = execute_function(&module, "simple_math");
+        let result = execute_function(&module, "simple_math", Vec::new(),);
         assert_eq!(result, Ok(GearsObject::Int(60)));
     }
 
@@ -134,7 +147,7 @@ mod tests {
         module_builder.finish_function();
 
         let module = module_builder.build();
-        let result = execute_function(&module, "simple_math");
+        let result = execute_function(&module, "simple_math", Vec::new(),);
         assert_eq!(result, Ok(GearsObject::Int(2)));
     } 
 }
