@@ -11,3 +11,7 @@ pub const BIN_DIV: u8 = 7;
 
 // Misc Opcodes
 pub const LOAD_CONST: u8 = 20;
+
+// Loading and Storing
+pub const LOAD_FAST: u8 = 30;
+pub const STORE_FAST: u8 = 31;
