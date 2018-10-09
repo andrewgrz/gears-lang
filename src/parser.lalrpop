@@ -38,6 +38,7 @@ FunctionDef: Box<ModStmtAst> = {
 
 
 Args = Comma<Arg>;
+FnArgs = Comma<Expr>;
 Exprs = SemiColon<Expr>;
 Stmts = SemiColon<Statement>;
 
@@ -64,6 +65,10 @@ Expr: ExprAst = {
     <Factor>,
 };
 
+FunctionCall: ExprAst = {
+    <name: Name> "(" <args: FnArgs> ")" => ExprAst::FunctionCall{<>}
+}
+
 ExprOp: BinOpAst = {
     "+" => BinOpAst::Add,
     "-" => BinOpAst::Sub,
@@ -81,6 +86,7 @@ FactorOp: BinOpAst = {
 
 Term: ExprAst = {
     Name => ExprAst::Variable(<>.to_string()),
+    <FunctionCall>,
     Integer => ExprAst::Integer(<>),
     "(" <Expr> ")"
 };

@@ -5,6 +5,7 @@ use std::fmt::Formatter;
 // Type Aliases
 type Name = String;
 type Args = Vec<ArgAst>;
+type FnArgs = Vec<ExprAst>;
 type Stmts = Vec<Box<StmtAst>>;
 
 #[derive(Debug)]
@@ -54,6 +55,7 @@ impl Debug for BinOpAst {
 }
 
 pub enum ExprAst {
+    FunctionCall { name: Name, args: FnArgs },
     Integer(i64),
     Op(Box<ExprAst>, BinOpAst, Box<ExprAst>),
     Variable(String),
@@ -69,6 +71,7 @@ impl Debug for ExprAst {
     fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
         use self::ExprAst::*;
         match *self {
+            FunctionCall { ref name, ref args } => write!(fmt, "{}({:?})", name, args),
             Integer(n) => write!(fmt, "{:?}", n),
             Variable(ref s) => write!(fmt, "{}", s),
             Op(ref l, op, ref r) => write!(fmt, "({:?} {:?} {:?})", l, op, r),
