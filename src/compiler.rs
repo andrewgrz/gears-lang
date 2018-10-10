@@ -36,9 +36,13 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
 
     for ref mod_stmt in &ast {
         match mod_stmt.as_ref() {
-            ModStmtAst::FunctionDef { name, exprs, .. } => {
+            ModStmtAst::FunctionDef { name, exprs, args } => {
                 module_builder.start_function(name.clone());
                 let mut local_scope = (&symbol_table).push();
+
+                for arg in args {
+                    local_scope.def_variable(arg.name().clone());
+                }
 
                 for stmt in exprs {
                     visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
@@ -87,6 +91,36 @@ fn visit_expr(
                 BinOpAst::Div => module_builder.op_div(),
             }
         }
+        ExprAst::FunctionCall { ref name, ref args } => {
+            println!("Calling function: {}", name);
+            for arg in args {
+                visit_expr(arg, scope, &mut module_builder)?;
+            }
+
+            let (maybe_symbol, is_global) = scope.resolve(name);
+
+            match maybe_symbol {
+                Some(symbol) => match symbol.get_type() {
+                    &SymbolType::Function => {
+                        if is_global {
+                            module_builder.call_fn(*symbol.get_index(), args.len() as u8);
+                        } else {
+                            return Err(GearsError::InternalCompilerError(
+                                "Closures are not supported yet".to_string(),
+                            ));
+                        }
+                    }
+                    &SymbolType::Variable => {
+                        // TODO: return location
+                        return Err(GearsError::ParseError {
+                            location: 0,
+                            message: format!("{} is not callable", name),
+                        });
+                    }
+                },
+                None => return Err(GearsError::SymbolNotFound(name.clone())),
+            }
+        }
         ExprAst::Variable(name) => {
             let (maybe_symbol, is_global) = scope.resolve(name);
 
@@ -94,7 +128,7 @@ fn visit_expr(
                 Some(symbol) => match symbol.get_type() {
                     &SymbolType::Function => {
                         return Err(GearsError::InternalCompilerError(
-                            "Functions are callable yet".to_string(),
+                            "Functions are not first class yet".to_string(),
                         ))
                     }
                     &SymbolType::Variable => {
