@@ -32,6 +32,10 @@ impl ArgAst {
     pub fn new(name: Name) -> ArgAst {
         ArgAst { name: name }
     }
+
+    pub fn name(&self) -> &Name {
+        &self.name
+    }
 }
 
 #[derive(Copy, Clone)]
