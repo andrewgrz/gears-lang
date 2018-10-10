@@ -3,13 +3,26 @@ use parser::Token;
 use std::io;
 
 #[derive(Debug)]
+pub enum InterOpErrorType {
+    TooManyArgs,
+    TooFewArgs,
+}
+
+#[derive(Debug)]
 pub enum GearsError {
     RustIOError(io::Error),
     FunctionNotFound(String),
     InternalCompilerError(String),
     TypeError(String),
     SymbolNotFound(String),
-    ParseError { location: usize, message: String },
+    InterOpError {
+        error: InterOpErrorType,
+        message: String,
+    },
+    ParseError {
+        location: usize,
+        message: String,
+    },
 }
 
 impl From<io::Error> for GearsError {
