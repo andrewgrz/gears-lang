@@ -7,7 +7,8 @@ use std::collections::HashMap;
 #[derive(Debug)]
 pub struct Module {
     name: String,
-    functions: HashMap<String, Function>,
+    function_lookup: HashMap<String, usize>,
+    functions: Vec<Function>,
     consts: Vec<GearsObject>,
 }
 
@@ -15,15 +16,28 @@ impl Module {
     fn new(name: String) -> Module {
         Module {
             name: name,
-            functions: HashMap::new(),
+            function_lookup: HashMap::new(),
+            functions: Vec::new(),
             consts: Vec::new(),
         }
     }
 
     pub fn get_function(&self, name: &str) -> Result<&Function, GearsError> {
-        match self.functions.get(&name.to_string()) {
-            Some(v) => Ok(v),
+        match self.function_lookup.get(&name.to_string()) {
+            Some(v) => match self.functions.get(*v) {
+                Some(v) => Ok(v),
+                None => Err(GearsError::InternalCompilerError(
+                    "Function Lookup did not point to a valid function".to_string(),
+                )),
+            },
             None => Err(GearsError::FunctionNotFound(name.to_string())),
+        }
+    }
+
+    pub fn get_function_by_index(&self, index: usize) -> Result<&Function, GearsError> {
+        match self.functions.get(index) {
+            Some(v) => Ok(v),
+            None => Err(GearsError::FunctionNotFound(format!("{}", index))),
         }
     }
 
@@ -84,11 +98,13 @@ impl ModuleBuilder {
             self.opcode(RETURN);
         }
 
+        let index = self.module.functions.len();
+
         match self.current_fn.as_mut() {
             Some(cur_fn) => {
-                self.module
-                    .functions
-                    .insert(cur_fn.get_name(), cur_fn.clone());
+                self.module.functions.push(cur_fn.clone());
+
+                self.module.function_lookup.insert(cur_fn.get_name(), index);
             }
             None => {}
         }
@@ -141,6 +157,12 @@ impl ModuleBuilder {
     pub fn load_fast(&mut self, index: u8) {
         self.opcode(LOAD_FAST);
         self.opcode(index);
+    }
+
+    pub fn call_fn(&mut self, index: u8, arg_count: u8) {
+        self.opcode(CALL_FUNCTION);
+        self.opcode(index);
+        self.opcode(arg_count);
     }
 }
 
