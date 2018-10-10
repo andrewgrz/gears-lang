@@ -73,8 +73,8 @@ impl ModuleBuilder {
         }
     }
 
-    pub fn start_function(&mut self, name: String) {
-        self.current_fn = Some(Function::new(name));
+    pub fn start_function(&mut self, name: String, num_args: usize) {
+        self.current_fn = Some(Function::new(name, num_args));
     }
 
     pub fn finish_function(&mut self) {
@@ -170,14 +170,16 @@ impl ModuleBuilder {
 #[derive(Debug, Clone)]
 pub struct Function {
     name: String,
+    num_args: usize,
     opcodes: Opcodes,
 }
 
 impl Function {
-    pub fn new(name: String) -> Function {
+    pub fn new(name: String, num_args: usize) -> Function {
         Function {
             name: name,
             opcodes: Opcodes::new(),
+            num_args: num_args,
         }
     }
 
@@ -187,5 +189,9 @@ impl Function {
 
     pub fn get_opcodes(&self) -> &Opcodes {
         &self.opcodes
+    }
+
+    pub fn num_args(&self) -> usize {
+        self.num_args
     }
 }

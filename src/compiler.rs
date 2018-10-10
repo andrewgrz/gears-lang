@@ -37,7 +37,7 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
     for ref mod_stmt in &ast {
         match mod_stmt.as_ref() {
             ModStmtAst::FunctionDef { name, exprs, args } => {
-                module_builder.start_function(name.clone());
+                module_builder.start_function(name.clone(), args.len());
                 let mut local_scope = (&symbol_table).push();
 
                 for arg in args {
@@ -92,7 +92,6 @@ fn visit_expr(
             }
         }
         ExprAst::FunctionCall { ref name, ref args } => {
-            println!("Calling function: {}", name);
             for arg in args {
                 visit_expr(arg, scope, &mut module_builder)?;
             }
