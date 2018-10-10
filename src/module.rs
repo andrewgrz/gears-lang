@@ -4,7 +4,7 @@ use opcodes::*;
 use std::collections::HashMap;
 
 /// Contains a compiled module
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Module {
     name: String,
     function_lookup: HashMap<String, usize>,
