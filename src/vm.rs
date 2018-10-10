@@ -1,12 +1,22 @@
 
 use module::{Module, Function};
 use object::{GearsResult, GearsObject};
-use errors::GearsError;
+use errors::{GearsError, InterOpErrorType};
 use opcodes::*;
 
 /// Execute a function contained in a compiled module
 pub fn execute_function(module: &Module, function: &str, args: Vec<GearsObject>) -> GearsResult {
     let mod_fn = module.get_function(function)?;
+    let num_given_args = args.len();
+    let num_fn_args = mod_fn.num_args();
+
+    if num_given_args != num_fn_args {
+        if num_given_args < num_fn_args {
+            return Err(GearsError::InterOpError{ error: InterOpErrorType::TooFewArgs, message: format!("Function missing args: {}, expected: {}, received: {}", function, num_fn_args, num_given_args)});
+        } else {
+            return Err(GearsError::InterOpError{ error: InterOpErrorType::TooManyArgs, message: format!("Function pass extra args: {}, expected: {}, received: {}", function, num_fn_args, num_given_args)});
+        }   
+    }
 
     execute(&mod_fn, &module, args)
 }
@@ -84,9 +94,6 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
                 }
                 next_args.reverse();
 
-                println!("{:?}", cur_instr);
-                println!("{:?}", next_args);
-
                 push!(execute(module.get_function_by_index(fn_index as usize)?, module, next_args)?);
             }
             _ => return Err(GearsError::InternalCompilerError(format!("Unexpected Opcode: {:?}", cur_instr))),
@@ -103,7 +110,7 @@ mod tests {
     fn test_addition() {
         let mut module_builder = ModuleBuilder::new("Test".to_string());
 
-        module_builder.start_function("simple_math".to_string());
+        module_builder.start_function("simple_math".to_string(), 0);
         module_builder.load_int(3);
         module_builder.load_int(4);
         module_builder.op_add();
@@ -120,7 +127,7 @@ mod tests {
     fn test_subtraction() {
         let mut module_builder = ModuleBuilder::new("Test".to_string());
 
-        module_builder.start_function("simple_math".to_string());
+        module_builder.start_function("simple_math".to_string(), 0);
         module_builder.load_int(20);
         module_builder.load_int(4);
         module_builder.op_sub();
@@ -137,7 +144,7 @@ mod tests {
     fn test_mul() {
         let mut module_builder = ModuleBuilder::new("Test".to_string());
 
-        module_builder.start_function("simple_math".to_string());
+        module_builder.start_function("simple_math".to_string(), 0);
         module_builder.load_int(3);
         module_builder.load_int(4);
         module_builder.op_mul();
@@ -154,7 +161,7 @@ mod tests {
     fn test_div() {
         let mut module_builder = ModuleBuilder::new("Test".to_string());
 
-        module_builder.start_function("simple_math".to_string());
+        module_builder.start_function("simple_math".to_string(), 0);
         module_builder.load_int(50);
         module_builder.load_int(5);
         module_builder.op_div();
