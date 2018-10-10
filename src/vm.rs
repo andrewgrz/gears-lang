@@ -72,6 +72,23 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
                 advance!();
                 push!((*module.get_const(cur_instr as usize)).clone());
             },
+            CALL_FUNCTION => {
+                advance!();
+                let fn_index = cur_instr;
+                advance!();
+
+                let mut next_args = Vec::new();
+
+                for _ in 0..cur_instr {
+                    next_args.push(pop!());
+                }
+                next_args.reverse();
+
+                println!("{:?}", cur_instr);
+                println!("{:?}", next_args);
+
+                push!(execute(module.get_function_by_index(fn_index as usize)?, module, next_args)?);
+            }
             _ => return Err(GearsError::InternalCompilerError(format!("Unexpected Opcode: {:?}", cur_instr))),
         }
     }
