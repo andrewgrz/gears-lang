@@ -86,9 +86,9 @@ FactorOp: BinOpAst = {
 
 Term: ExprAst = {
     Name => ExprAst::Variable(<>.to_string()),
-    <FunctionCall>,
     Integer => ExprAst::Integer(<>),
-    "(" <Expr> ")"
+    "(" <Expr> ")",
+    <FunctionCall>,     
 };
 
 Name: String = r"[_a-zA-Z][_a-zA-Z0-9]{0,}" => String::from_str(<>).unwrap();

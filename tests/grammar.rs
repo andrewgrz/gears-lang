@@ -49,10 +49,10 @@ fn test_grammar() {
                                     }
                                 }
                             }
-                        },
+                        }
                         None => {
                             println!("Unexpected EOF token");
-                        },
+                        }
                     };
                     println!("Expected: ");
                     for exp_token in expected {
@@ -60,7 +60,7 @@ fn test_grammar() {
                     }
                     print!("{}", '\n');
                 }
-                _ => println!("Unexpected Error: {:?}", e)
+                _ => println!("Unexpected Error: {:?}", e),
             }
             panic!("Grammar Error. Please review output.")
         }
