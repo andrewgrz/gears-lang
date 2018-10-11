@@ -14,6 +14,7 @@ fn create_type_error(op: &str, left: &GearsObject, right: &GearsObject) -> Gears
 #[derive(Debug, PartialEq, Clone)]
 pub enum GearsObject {
     Int(i64),
+    Bool(bool),
     None,
 }
 
@@ -71,6 +72,7 @@ impl GearsObject {
 
         match self {
             Int(_) => "Integer",
+            Bool(_) => "Bool",
             None => "NoneType",
         }
     }
