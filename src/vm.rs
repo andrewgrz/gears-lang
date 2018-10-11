@@ -95,7 +95,13 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
                 next_args.reverse();
 
                 push!(execute(module.get_function_by_index(fn_index as usize)?, module, next_args)?);
-            }
+            },
+            LOAD_TRUE => {
+                push!(GearsObject::Bool(true));
+            },
+            LOAD_FALSE => {
+                push!(GearsObject::Bool(false));
+            },
             _ => return Err(GearsError::InternalCompilerError(format!("Unexpected Opcode: {:?}", cur_instr))),
         }
     }
