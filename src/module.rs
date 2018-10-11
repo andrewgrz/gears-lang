@@ -164,6 +164,14 @@ impl ModuleBuilder {
         self.opcode(index);
         self.opcode(arg_count);
     }
+
+    pub fn load_bool(&mut self, b: &bool) {
+        if *b {
+            self.opcode(LOAD_TRUE);
+        } else {
+            self.opcode(LOAD_FALSE);
+        }
+    }
 }
 
 /// A compiled function

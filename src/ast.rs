@@ -63,6 +63,7 @@ pub enum ExprAst {
     Integer(i64),
     Op(Box<ExprAst>, BinOpAst, Box<ExprAst>),
     Variable(String),
+    Bool(bool),
 }
 
 impl ExprAst {
@@ -79,6 +80,7 @@ impl Debug for ExprAst {
             Integer(n) => write!(fmt, "{:?}", n),
             Variable(ref s) => write!(fmt, "{}", s),
             Op(ref l, op, ref r) => write!(fmt, "({:?} {:?} {:?})", l, op, r),
+            Bool(b) => write!(fmt, "{:?}", b),
         }
     }
 }

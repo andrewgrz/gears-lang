@@ -80,6 +80,7 @@ fn visit_expr(
 ) -> Result<(), GearsError> {
     match expr {
         ExprAst::Integer(e) => module_builder.load_int(*e),
+        ExprAst::Bool(b) => module_builder.load_bool(b),
         ExprAst::Op(left, op, right) => {
             visit_expr(left, scope, &mut module_builder)?;
             visit_expr(right, scope, &mut module_builder)?;

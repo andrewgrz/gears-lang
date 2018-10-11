@@ -5,12 +5,15 @@ use gears_lang::parser;
 use lalrpop_util::ParseError;
 
 const FULL_GRAMMAR_EXAMPLE: &str = r#"
-def simple_math(a, b) {
+def exampl(a, b) {
     sub(6 - 2);
     let a = 4 - 3;
     let b = a * 9;
     let c = sub(a - b);
-    12 * add(a + 4 - add_two(5), b) + c
+    12 * add(a + 4 - add_two(5), b) + c;
+
+    let d = false;
+    let e = true;
 }
 "#;
 
