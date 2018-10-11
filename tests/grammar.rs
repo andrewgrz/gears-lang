@@ -15,6 +15,20 @@ def exampl(a, b) {
     let d = false;
     let e = true;
 }
+
+def branching() {
+    if false {
+        let other_variable = 4;
+    } 
+    else {
+        let other_variable = 5;
+    };
+    
+    if true {
+        let a = 4 - 3;
+    }; 
+}
+
 "#;
 
 #[test]

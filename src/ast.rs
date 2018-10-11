@@ -8,7 +8,7 @@ type Args = Vec<ArgAst>;
 type FnArgs = Vec<ExprAst>;
 type Stmts = Vec<Box<StmtAst>>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ModStmtAst {
     FunctionDef {
         name: String,
@@ -17,13 +17,13 @@ pub enum ModStmtAst {
     },
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum StmtAst {
     Expr(ExprAst),
     Assignment { name: String, expr: ExprAst },
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ArgAst {
     name: Name,
 }
@@ -58,29 +58,26 @@ impl Debug for BinOpAst {
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum ExprAst {
     FunctionCall { name: Name, args: FnArgs },
     Integer(i64),
     Op(Box<ExprAst>, BinOpAst, Box<ExprAst>),
     Variable(String),
     Bool(bool),
+    If{ cmp_expr: Box<ExprAst>, exprs: Stmts, else_exprs: Option<Stmts> },
 }
 
 impl ExprAst {
     pub fn new_op(left: ExprAst, op: BinOpAst, right: ExprAst) -> ExprAst {
         ExprAst::Op(Box::new(left), op, Box::new(right))
     }
-}
 
-impl Debug for ExprAst {
-    fn fmt(&self, fmt: &mut Formatter) -> Result<(), Error> {
-        use self::ExprAst::*;
-        match *self {
-            FunctionCall { ref name, ref args } => write!(fmt, "{}({:?})", name, args),
-            Integer(n) => write!(fmt, "{:?}", n),
-            Variable(ref s) => write!(fmt, "{}", s),
-            Op(ref l, op, ref r) => write!(fmt, "({:?} {:?} {:?})", l, op, r),
-            Bool(b) => write!(fmt, "{:?}", b),
+    pub fn new_if(cmp_expr: ExprAst, exprs: Stmts, else_exprs: Option<Stmts>) -> ExprAst {
+        ExprAst::If {
+            cmp_expr: Box::new(cmp_expr),
+            exprs: exprs,
+            else_exprs: else_exprs
         }
     }
 }

@@ -69,6 +69,10 @@ FunctionCall: ExprAst = {
     <name: Name> "(" <args: FnArgs> ")" => ExprAst::FunctionCall{<>}
 }
 
+IfExpr: ExprAst = {
+    "if" <cmp_expr: Expr> <exprs: Block> <else_exprs: ("else" <Block>)?> => ExprAst::new_if(<>)
+}
+
 ExprOp: BinOpAst = {
     "+" => BinOpAst::Add,
     "-" => BinOpAst::Sub,
@@ -87,6 +91,7 @@ FactorOp: BinOpAst = {
 Term: ExprAst = {
     Name => ExprAst::Variable(<>.to_string()),
     Integer => ExprAst::Integer(<>),
+    <IfExpr>,
     "false" => ExprAst::Bool(false),
     "true" => ExprAst::Bool(true),
     <FunctionCall>,     
