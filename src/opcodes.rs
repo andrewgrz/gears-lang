@@ -3,6 +3,8 @@ pub type Opcodes = Vec<u8>;
 // Control Flow Opcodes
 pub const RETURN: u8 = 0;
 pub const CALL_FUNCTION: u8 = 1;
+pub const JUMP: u8 = 2;
+pub const JUMP_IF_FALSE: u8 = 3;
 
 // Binary Opcodes
 pub const BIN_ADD: u8 = 4;
