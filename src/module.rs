@@ -124,6 +124,24 @@ impl ModuleBuilder {
         }
     }
 
+    #[inline]
+    fn set_opcode_at(&mut self, index: usize, opcode: u8) {
+        match self.current_fn.as_mut() {
+            Some(cur_fn) => cur_fn.opcodes[index] = opcode,
+            None => {}
+        }
+    }
+
+    /// Get the index of the last opcode in the fn
+    #[inline]
+    fn last_index(&self) -> usize {
+        let index = match self.current_fn.as_ref() {
+            Some(cur_fn) => cur_fn.opcodes.len(),
+            None => 1,
+        };
+        index - 1
+    }
+
     pub fn load_int(&mut self, number: i64) {
         let index = self.module.insert_int(number);
 
@@ -171,6 +189,25 @@ impl ModuleBuilder {
         } else {
             self.opcode(LOAD_FALSE);
         }
+    }
+
+    pub fn start_jump_if_false(&mut self) -> usize {
+        self.opcode(JUMP_IF_FALSE);
+        self.opcode(0); // Placeholder
+        self.last_index()
+    }
+
+    pub fn start_else(&mut self, index: usize) -> usize {
+        self.opcode(JUMP);
+        self.opcode(0); // Placeholder
+        let cur_index = self.last_index();
+        self.set_opcode_at(index, (cur_index - index) as u8);
+        cur_index
+    }
+
+    pub fn end_jump(&mut self, index: usize) {
+        let cur_index = self.last_index();
+        self.set_opcode_at(index, (cur_index - index) as u8);
     }
 }
 
