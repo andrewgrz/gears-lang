@@ -1,4 +1,5 @@
 use errors::GearsError;
+use std::str::FromStr;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Span {
@@ -98,7 +99,7 @@ pub fn lex(input: &str) -> Result<Vec<Token>, GearsError> {
             '/' => token!(Slash, 1),
 
             _ if c.is_alphabetic() || c == '_' => {
-                let (tmp, next) = take_while(c, &mut chars, |c| c.is_alphabetic() || c == '_');
+                let (tmp, next) = take_while(c, &mut chars, |c| c.is_alphabetic() || c == '_' || c.is_digit(10));
                 lookahead = next;
                 let len = tmp.len();
                 
@@ -112,6 +113,16 @@ pub fn lex(input: &str) -> Result<Vec<Token>, GearsError> {
                     _ => token_data!(TokType::Name(tmp), len)
                 }
 
+                continue;
+            },
+
+            _ if c.is_digit(10) => {
+                let (tmp, next) = take_while(c, &mut chars, |c| c.is_digit(10));
+                lookahead = next;
+                token_data!(
+                    TokType::Integer(i64::from_str(&tmp).unwrap()),
+                    tmp.len()
+                );
                 continue;
             },
 
@@ -157,12 +168,22 @@ mod tests {
     macro_rules! expect {
         ($left:expr, $right:expr) => {{
             let result = lex($left).unwrap();
+
+            if result.len() != $right.len() {
+                panic!(format!("Uneven length of tokens:\nLeft: {:?}\nRight:{:?}", result, $right));
+            }
             
             for (index, tok) in result.iter().enumerate() {
                 if $right[index] != tok.tok_type {
                     panic!(format!("Tokens did not match at index: {}. Found: {:?}, Expected: {:?}", index, tok, $right[index]));
                 }
             }
+        }};
+    }
+
+    macro_rules! ident_test {
+        ($string: expr) => {{
+            expect!($string, vec![Name($string.to_string())]);
         }};
     }
 
@@ -193,6 +214,20 @@ mod tests {
         expect!("else", vec![Else]);
         expect!("true", vec![True]);
         expect!("false", vec![False]);
+    }
+
+    #[test]
+    fn test_ident() {
+        use super::TokType::*;
+        ident_test!("test");
+        ident_test!("t");
+        ident_test!("_tes");
+        ident_test!("_");
+        ident_test!("TEST");
+        ident_test!("Test");
+        ident_test!("tesT");
+        ident_test!("abcdefghijklmnopqrstuvwxyz0123456789");
+        ident_test!("t3st");
     }
 
     #[test]
