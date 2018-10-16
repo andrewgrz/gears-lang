@@ -76,4 +76,14 @@ impl GearsObject {
             None => "NoneType",
         }
     }
+
+    pub fn as_bool(&self) -> bool {
+        use self::GearsObject::*;
+
+        match self {
+            Bool(b) => *b,
+            Int(i) => *i != 0,
+            None => false,
+        }
+    }
 }
