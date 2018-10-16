@@ -28,3 +28,19 @@ fn test_bool_return() {
         GearsObject::Bool(false)
     );
 }
+
+#[test]
+fn test_simple_branch_true() {
+    assert_eq!(
+        execute_function(&setup(), "simple_branch", vec![GearsObject::Bool(true)]).unwrap(),
+        GearsObject::Int(5)
+    );
+}
+
+#[test]
+fn test_simple_branch_false() {
+    assert_eq!(
+        execute_function(&setup(), "simple_branch", vec![GearsObject::Bool(false)]).unwrap(),
+        GearsObject::Int(4)
+    );
+}
