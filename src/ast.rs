@@ -60,12 +60,19 @@ impl Debug for BinOpAst {
 
 #[derive(Debug, Clone)]
 pub enum ExprAst {
-    FunctionCall { name: Name, args: FnArgs },
+    FunctionCall {
+        name: Name,
+        args: FnArgs,
+    },
     Integer(i64),
     Op(Box<ExprAst>, BinOpAst, Box<ExprAst>),
     Variable(String),
     Bool(bool),
-    If{ cmp_expr: Box<ExprAst>, exprs: Stmts, else_exprs: Option<Stmts> },
+    If {
+        cmp_expr: Box<ExprAst>,
+        exprs: Stmts,
+        else_exprs: Option<Stmts>,
+    },
 }
 
 impl ExprAst {
@@ -77,7 +84,7 @@ impl ExprAst {
         ExprAst::If {
             cmp_expr: Box::new(cmp_expr),
             exprs: exprs,
-            else_exprs: else_exprs
+            else_exprs: else_exprs,
         }
     }
 }
