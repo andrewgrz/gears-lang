@@ -81,6 +81,33 @@ fn visit_expr(
     match expr {
         ExprAst::Integer(e) => module_builder.load_int(*e),
         ExprAst::Bool(b) => module_builder.load_bool(b),
+        ExprAst::If {
+            cmp_expr,
+            exprs,
+            else_exprs,
+        } => {
+            visit_expr(cmp_expr, scope, &mut module_builder)?;
+            let jump_index = module_builder.start_jump_if_false();
+            let mut local_scope = (&scope).push();
+
+            for stmt in exprs {
+                visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
+            }
+
+            match else_exprs {
+                Some(exprs) => {
+                    let jump_index = module_builder.start_else(jump_index);
+                    let mut local_scope = (&scope).push();
+                    for stmt in exprs {
+                        visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
+                    }
+                    module_builder.end_jump(jump_index);
+                }
+                None => {
+                    module_builder.end_jump(jump_index);
+                }
+            }
+        }
         ExprAst::Op(left, op, right) => {
             visit_expr(left, scope, &mut module_builder)?;
             visit_expr(right, scope, &mut module_builder)?;
