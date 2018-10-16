@@ -58,6 +58,18 @@ pub fn lex(input: &str) -> Result<Vec<Token>, GearsError> {
     let mut line = 1;
     let mut column = 1;
 
+    macro_rules! token_data {
+        ($tok:expr, $size: expr) => {{
+            let start = column;
+            column += $size;
+            tokens.push(Token {
+                tok_type: $tok,
+                start: Span::new(line, start),
+                end: Span::new(line, column),
+            });
+        }};
+    }
+
     macro_rules! token {
         ($tok:ident, $size: expr) => {{
             let start = column;
@@ -85,6 +97,24 @@ pub fn lex(input: &str) -> Result<Vec<Token>, GearsError> {
             '*' => token!(Star, 1),
             '/' => token!(Slash, 1),
 
+            _ if c.is_alphabetic() || c == '_' => {
+                let (tmp, next) = take_while(c, &mut chars, |c| c.is_alphabetic() || c == '_');
+                lookahead = next;
+                let len = tmp.len();
+                
+                match tmp.as_str() {
+                    "def" => token!(Def, len),
+                    "let" => token!(Let, len),
+                    "if" => token!(If, len),
+                    "else" => token!(Else, len),
+                    "true" => token!(True, len),
+                    "false" => token!(False, len),
+                    _ => token_data!(TokType::Name(tmp), len)
+                }
+
+                continue;
+            },
+
             ' ' => column += 1,
             '\n' => {
                 line += 1;
@@ -98,6 +128,26 @@ pub fn lex(input: &str) -> Result<Vec<Token>, GearsError> {
     }
 
     Ok(tokens)
+}
+
+fn take_while<C, F>(c0: char, chars: &mut C, f: F) -> (String, Option<char>)
+where
+    C: Iterator<Item = char>,
+    F: Fn(char) -> bool,
+{
+    let mut buf = String::new();
+
+    buf.push(c0);
+
+    while let Some(c) = chars.next() {
+        if !f(c) {
+            return (buf, Some(c));
+        }
+
+        buf.push(c);
+    }
+
+    return (buf, None);
 }
 
 #[cfg(test)]
@@ -134,9 +184,21 @@ mod tests {
     }
 
     #[test]
+    fn test_keywords() {
+        use super::TokType::*;
+
+        expect!("def", vec![Def]);
+        expect!("let", vec![Let]);
+        expect!("if", vec![If]);
+        expect!("else", vec![Else]);
+        expect!("true", vec![True]);
+        expect!("false", vec![False]);
+    }
+
+    #[test]
     fn test_spanning() {
         assert_eq!(
-            lex("( )\n()").unwrap(),
+            lex("( )\n() def").unwrap(),
             vec![
                 Token {
                     tok_type: TokType::LParen,
@@ -157,6 +219,11 @@ mod tests {
                     tok_type: TokType::RParen,
                     start: Span::new(2, 2),
                     end: Span::new(2, 3),
+                },
+                Token {
+                    tok_type: TokType::Def,
+                    start: Span::new(2, 4),
+                    end: Span::new(2, 7),
                 }
             ]
         );
