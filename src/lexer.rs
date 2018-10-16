@@ -99,10 +99,12 @@ pub fn lex(input: &str) -> Result<Vec<Token>, GearsError> {
             '/' => token!(Slash, 1),
 
             _ if c.is_alphabetic() || c == '_' => {
-                let (tmp, next) = take_while(c, &mut chars, |c| c.is_alphabetic() || c == '_' || c.is_digit(10));
+                let (tmp, next) = take_while(c, &mut chars, |c| {
+                    c.is_alphabetic() || c == '_' || c.is_digit(10)
+                });
                 lookahead = next;
                 let len = tmp.len();
-                
+
                 match tmp.as_str() {
                     "def" => token!(Def, len),
                     "let" => token!(Let, len),
@@ -110,21 +112,18 @@ pub fn lex(input: &str) -> Result<Vec<Token>, GearsError> {
                     "else" => token!(Else, len),
                     "true" => token!(True, len),
                     "false" => token!(False, len),
-                    _ => token_data!(TokType::Name(tmp), len)
+                    _ => token_data!(TokType::Name(tmp), len),
                 }
 
                 continue;
-            },
+            }
 
             _ if c.is_digit(10) => {
                 let (tmp, next) = take_while(c, &mut chars, |c| c.is_digit(10));
                 lookahead = next;
-                token_data!(
-                    TokType::Integer(i64::from_str(&tmp).unwrap()),
-                    tmp.len()
-                );
+                token_data!(TokType::Integer(i64::from_str(&tmp).unwrap()), tmp.len());
                 continue;
-            },
+            }
 
             ' ' => column += 1,
             '\n' => {
@@ -170,12 +169,18 @@ mod tests {
             let result = lex($left).unwrap();
 
             if result.len() != $right.len() {
-                panic!(format!("Uneven length of tokens:\nLeft: {:?}\nRight:{:?}", result, $right));
+                panic!(format!(
+                    "Uneven length of tokens:\nLeft: {:?}\nRight:{:?}",
+                    result, $right
+                ));
             }
-            
+
             for (index, tok) in result.iter().enumerate() {
                 if $right[index] != tok.tok_type {
-                    panic!(format!("Tokens did not match at index: {}. Found: {:?}, Expected: {:?}", index, tok, $right[index]));
+                    panic!(format!(
+                        "Tokens did not match at index: {}. Found: {:?}, Expected: {:?}",
+                        index, tok, $right[index]
+                    ));
                 }
             }
         }};
