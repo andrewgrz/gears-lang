@@ -1,4 +1,5 @@
 use lalrpop_util::ParseError;
+use lexer::Span;
 use parser::Token;
 use std::io;
 
@@ -19,6 +20,7 @@ pub enum GearsError {
         error: InterOpErrorType,
         message: String,
     },
+    UnrecognizedToken(Span),
     ParseError {
         location: usize,
         message: String,

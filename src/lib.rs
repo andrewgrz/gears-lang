@@ -1,6 +1,7 @@
 extern crate lalrpop_util;
 
 mod ast;
+mod lexer;
 mod opcodes;
 mod symbol;
 
