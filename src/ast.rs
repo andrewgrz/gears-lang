@@ -3,10 +3,10 @@ use std::fmt::Error;
 use std::fmt::Formatter;
 
 // Type Aliases
-type Name = String;
-type Args = Vec<ArgAst>;
-type FnArgs = Vec<ExprAst>;
-type Stmts = Vec<Box<StmtAst>>;
+pub type Name = String;
+pub type Args = Vec<ArgAst>;
+pub type FnArgs = Vec<ExprAst>;
+pub type Stmts = Vec<Box<StmtAst>>;
 
 #[derive(Debug, Clone)]
 pub enum ModStmtAst {

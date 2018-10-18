@@ -1,8 +1,36 @@
 
 use ast::*;
-use std::str::FromStr;
+use lexer;
 
 grammar;
+
+extern {
+    type Location = lexer::Span;
+    type Error = lexer::LexicalError;
+
+    enum lexer::Token {
+        "(" => lexer::Token::LParen,
+        ")" => lexer::Token::RParen,
+        "-" => lexer::Token::Minus,
+        "+" => lexer::Token::Plus,
+        "*" => lexer::Token::Star,
+        "/" => lexer::Token::Slash,
+        "{" => lexer::Token::LBracket,
+        "}" => lexer::Token::RBracket,
+        ";" => lexer::Token::SemiColon,
+        ":" => lexer::Token::Colon,
+        "," => lexer::Token::Comma,
+        "=" => lexer::Token::Eq,
+        Integer => lexer::Token::Integer(<i64>),
+        Name => lexer::Token::Name(<String>),
+        "def" => lexer::Token::Def,
+        "if" => lexer::Token::If,
+        "else" => lexer::Token::Else,
+        "let" => lexer::Token::Let,
+        "true" => lexer::Token::True,
+        "false" => lexer::Token::False,
+    }
+}
 
 Comma<T>: Vec<T> = {
     <v:(<T> ",")*> <e:T?> => match e {

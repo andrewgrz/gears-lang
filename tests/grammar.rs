@@ -1,7 +1,6 @@
 extern crate gears_lang;
 extern crate lalrpop_util;
 
-use gears_lang::parser;
 use lalrpop_util::ParseError;
 
 const FULL_GRAMMAR_EXAMPLE: &str = r#"
@@ -33,7 +32,7 @@ def branching() {
 
 #[test]
 fn test_grammar() {
-    let result = parser::ModuleParser::new().parse(FULL_GRAMMAR_EXAMPLE);
+    let result = gears_lang::parse_str(FULL_GRAMMAR_EXAMPLE);
 
     match result {
         Err(e) => {
@@ -41,28 +40,16 @@ fn test_grammar() {
                 ParseError::UnrecognizedToken { token, expected } => {
                     match token {
                         Some(tok) => {
-                            println!("At Character: {} Found: '{}'", tok.0, tok.1);
-                            let mut cur_line: String = String::new();
-                            let mut should_print = false;
-                            let mut offset = String::new();
+                            println!("At Character: {} Found: '{:?}'", tok.0, tok.1);
 
-                            for (index, character) in FULL_GRAMMAR_EXAMPLE.chars().enumerate() {
-                                if character == '\n' || index == 0 {
-                                    if should_print {
-                                        println!("{}", cur_line);
-                                        println!("{}^", offset);
-                                        break;
-                                    } else {
-                                        cur_line = String::new();
+                            for (line_num, line) in FULL_GRAMMAR_EXAMPLE.lines().enumerate() {
+                                if line_num + 1 == tok.0.line() {
+                                    println!("{}", line);
+                                    for _ in 0 .. (tok.0.column() - 1) {
+                                        print!(" ")
                                     }
-                                }
-
-                                cur_line.push(character);
-
-                                if index == tok.0 {
-                                    should_print = true;
-                                    for _ in 0..(cur_line.len() - 2) {
-                                        offset.push(' ');
+                                    for _ in 0 .. (tok.2.column() - tok.0.column() ) {
+                                        print!("^")
                                     }
                                 }
                             }
@@ -71,7 +58,7 @@ fn test_grammar() {
                             println!("Unexpected EOF token");
                         }
                     };
-                    println!("Expected: ");
+                    println!("\nExpected: ");
                     for exp_token in expected {
                         print!("{}, ", exp_token);
                     }

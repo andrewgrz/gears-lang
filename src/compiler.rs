@@ -2,6 +2,7 @@ use ast::*;
 use errors::GearsError;
 use module::{Module, ModuleBuilder};
 use parser;
+use lexer;
 use std::fs::File;
 use std::io::prelude::*;
 use symbol::{SymbolTable, SymbolType};
@@ -16,7 +17,7 @@ pub fn compile_file(filename: &str) -> Result<Module, GearsError> {
 
 /// Compile a String to module
 pub fn compile_str(string: &str, name: &str) -> Result<Module, GearsError> {
-    compile_ast(parser::ModuleParser::new().parse(string)?, name)
+    compile_ast(parser::ModuleParser::new().parse(lexer::lex(string))?, name)
 }
 
 /// Compiles AST to Module and Bytecode
@@ -140,7 +141,7 @@ fn visit_expr(
                     &SymbolType::Variable => {
                         // TODO: return location
                         return Err(GearsError::ParseError {
-                            location: 0,
+                            location: lexer::Span::new(0,0),
                             message: format!("{} is not callable", name),
                         });
                     }

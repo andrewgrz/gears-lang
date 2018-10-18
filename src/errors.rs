@@ -1,6 +1,5 @@
 use lalrpop_util::ParseError;
-use lexer::Span;
-use parser::Token;
+use lexer::{Token, Span, LexicalError};
 use std::io;
 
 #[derive(Debug)]
@@ -20,9 +19,8 @@ pub enum GearsError {
         error: InterOpErrorType,
         message: String,
     },
-    UnrecognizedToken(Span),
     ParseError {
-        location: usize,
+        location: Span,
         message: String,
     },
 }
@@ -33,17 +31,17 @@ impl From<io::Error> for GearsError {
     }
 }
 
-impl<'a> From<ParseError<usize, Token<'a>, &'a str>> for GearsError {
-    fn from(error: ParseError<usize, Token<'a>, &'a str>) -> Self {
+impl<'a> From<ParseError<Span, Token, LexicalError>> for GearsError {
+    fn from(error: ParseError<Span, Token, LexicalError>) -> Self {
         match error {
             ParseError::InvalidToken { location } => GearsError::ParseError {
+                message: format!("Invalid token found at {}", &location),
                 location: location,
-                message: format!("Invalid token found at {}", location),
             },
             ParseError::UnrecognizedToken { token, expected } => {
                 let (mut token_msg, location) = match token {
-                    Some(tok) => (format!("Unexpected token ({}) at {}", tok.1, tok.0), tok.0),
-                    None => (format!("Unexpected EOF token"), 0),
+                    Some(tok) => (format!("Unexpected token ({:?}) at {}", tok.1, tok.0), tok.0),
+                    None => (format!("Unexpected EOF token"), Span::new(0,0)),
                 };
 
                 token_msg += &format!("Expected one of: {:?}", expected);
@@ -54,11 +52,11 @@ impl<'a> From<ParseError<usize, Token<'a>, &'a str>> for GearsError {
                 }
             }
             ParseError::ExtraToken { token } => GearsError::ParseError {
+                message: format!("Extra token ({:?}) at {}", token.1, token.0),
                 location: token.0,
-                message: format!("Extra token ({}) at {}", token.1, token.0),
             },
             ParseError::User { error } => GearsError::ParseError {
-                location: 0,
+                location: Span::new(0 , 0),
                 message: format!("{:?}", error),
             },
         }
