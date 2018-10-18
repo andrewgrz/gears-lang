@@ -97,9 +97,3 @@ Term: ExprAst = {
     <FunctionCall>,     
     "(" <Expr> ")",
 };
-
-Name: String = r"[_a-zA-Z][_a-zA-Z0-9]{0,}" => String::from_str(<>).unwrap();
-
-Integer: i64 = {
-    r"[0-9]+" => i64::from_str(<>).unwrap(),
-};
