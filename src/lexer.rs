@@ -136,7 +136,12 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
             '\n' => {
                 line += 1;
                 column = 1;
-            }
+            },
+            '#' => {
+                let (_, next) = take_while(c, &mut chars, |c| c != '\n');
+                lookahead = next;
+                continue;
+            },
             _ => tokens.push(Err(LexicalError::UnknownToken(c))),
         }
 
@@ -240,6 +245,13 @@ mod tests {
         ident_test!("tesT");
         ident_test!("abcdefghijklmnopqrstuvwxyz0123456789");
         ident_test!("t3st");
+    }
+
+    #[test]
+    fn test_comments() {
+        use super::Token::*;
+
+        expect!("()#Test", vec![LParen, RParen]);
     }
 
     // #[test]

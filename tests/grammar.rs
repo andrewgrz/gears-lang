@@ -4,8 +4,10 @@ extern crate lalrpop_util;
 use lalrpop_util::ParseError;
 
 const FULL_GRAMMAR_EXAMPLE: &str = r#"
+# Top Level Comment
 def exampl(a, b) {
-    sub(6 - 2);
+    sub(6 - 2);   # This is a function that is not bound
+    # This is a new binding
     let a = 4 - 3;
     let b = a * 9;
     let c = sub(a - b);
