@@ -2,7 +2,7 @@
 use std::str::FromStr;
 use std::fmt;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum LexicalError {
     UnknownToken(char),
 }
@@ -254,37 +254,23 @@ mod tests {
         expect!("()#Test", vec![LParen, RParen]);
     }
 
-    // #[test]
-    // fn test_spanning() {
-    //     assert_eq!(
-    //         lex("( )\n() def").unwrap(),
-    //         vec![
-    //             Token {
-    //                 tok_type: TokType::LParen,
-    //                 start: Span::new(1, 1),
-    //                 end: Span::new(1, 2),
-    //             },
-    //             Token {
-    //                 tok_type: TokType::RParen,
-    //                 start: Span::new(1, 3),
-    //                 end: Span::new(1, 4),
-    //             },
-    //             Token {
-    //                 tok_type: TokType::LParen,
-    //                 start: Span::new(2, 1),
-    //                 end: Span::new(2, 2),
-    //             },
-    //             Token {
-    //                 tok_type: TokType::RParen,
-    //                 start: Span::new(2, 2),
-    //                 end: Span::new(2, 3),
-    //             },
-    //             Token {
-    //                 tok_type: TokType::Def,
-    //                 start: Span::new(2, 4),
-    //                 end: Span::new(2, 7),
-    //             }
-    //         ]
-    //     );
-    // }
+    #[test]
+    fn test_spanning() {
+        use super::Token::*;
+
+        fn get_token(token: Token, line: usize, start: usize, end: usize) -> Result<(Span, Token, Span), LexicalError> {
+            Ok((Span::new(line, start), token, Span::new(line, end)))
+        }
+
+        assert_eq!(
+            lex("( )\n() def"),
+            vec![
+                get_token(LParen, 1, 1, 2),
+                get_token(RParen, 1, 3, 4),
+                get_token(LParen, 2, 1, 2),
+                get_token(RParen, 2, 2, 3),
+                get_token(Def, 2, 4, 7),
+            ]
+        );
+    }
 }
