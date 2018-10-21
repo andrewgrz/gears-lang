@@ -119,9 +119,9 @@ FactorOp: BinOpAst = {
 Term: ExprAst = {
     Name => ExprAst::Variable(<>.to_string()),
     Integer => ExprAst::Integer(<>),
-    <IfExpr>,
     "false" => ExprAst::Bool(false),
     "true" => ExprAst::Bool(true),
+    <IfExpr>,
     <FunctionCall>,     
     "(" <Expr> ")",
 };
