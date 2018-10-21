@@ -5,7 +5,7 @@ use lalrpop_util::ParseError;
 
 const FULL_GRAMMAR_EXAMPLE: &str = r#"
 # Top Level Comment
-def exampl(a, b) {
+def example(a, b) {
     sub(6 - 2);   # This is a function that is not bound
     # This is a new binding
     let a = 4 - 3;
@@ -20,16 +20,14 @@ def exampl(a, b) {
 def branching() {
     if false {
         let other_variable = 4;
-    } 
-    else {
+    } else {
         let other_variable = 5;
     };
     
     if true {
         let a = 4 - 3;
-    }; 
+    } 
 }
-
 "#;
 
 #[test]
@@ -51,7 +49,7 @@ fn test_grammar() {
                                         print!(" ")
                                     }
                                     for _ in 0 .. (tok.2.column() - tok.0.column() ) {
-                                        print!("^")
+                                        print!("-")
                                     }
                                 }
                             }
