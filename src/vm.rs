@@ -104,13 +104,11 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
             },
             JUMP => {
                 advance!();
-                println!("Jumping: {:?}", cur_instr);
                 ip += cur_instr as usize;
             },
             JUMP_IF_FALSE => {
                 advance!();
                 if !pop!().as_bool() {
-                    println!("Jumping: {:?}", cur_instr);
                     ip += cur_instr as usize; 
                 }
             }
