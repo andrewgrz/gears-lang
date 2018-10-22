@@ -20,3 +20,4 @@ pub const LOAD_FAST: u8 = 30;
 pub const STORE_FAST: u8 = 31;
 pub const LOAD_TRUE: u8 = 32;
 pub const LOAD_FALSE: u8 = 33;
+pub const LOAD_NONE: u8 = 34;
