@@ -44,3 +44,19 @@ fn test_simple_branch_false() {
         GearsObject::Int(4)
     );
 }
+
+#[test]
+fn test_five_or_none_true() {
+    assert_eq!(
+        execute_function(&setup(), "five_or_none", vec![GearsObject::Bool(true)]).unwrap(),
+        GearsObject::Int(5)
+    );
+}
+
+#[test]
+fn test_five_or_none_false() {
+    assert_eq!(
+        execute_function(&setup(), "five_or_none", vec![GearsObject::None]).unwrap(),
+        GearsObject::None
+    );
+}

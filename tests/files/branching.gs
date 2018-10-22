@@ -14,3 +14,9 @@ def simple_branch(test) {
         4
     }
 }
+
+def five_or_none(test) {
+    if test {
+        5
+    }
+}
