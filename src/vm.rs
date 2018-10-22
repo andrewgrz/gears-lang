@@ -102,6 +102,9 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
             LOAD_FALSE => {
                 push!(GearsObject::Bool(false));
             },
+            LOAD_NONE => {
+                push!(GearsObject::None);
+            },
             JUMP => {
                 advance!();
                 ip += cur_instr as usize;
