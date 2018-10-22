@@ -73,6 +73,10 @@ pub enum ExprAst {
         exprs: Stmts,
         else_exprs: Option<Stmts>,
     },
+    While {
+        cmp_expr: Box<ExprAst>,
+        exprs: Stmts,
+    }
 }
 
 impl ExprAst {
@@ -85,6 +89,13 @@ impl ExprAst {
             cmp_expr: Box::new(cmp_expr),
             exprs: exprs,
             else_exprs: else_exprs,
+        }
+    }
+
+    pub fn new_while(cmp_expr: ExprAst, exprs: Stmts) -> ExprAst {
+        ExprAst::While {
+            cmp_expr: Box::new(cmp_expr),
+            exprs: exprs,
         }
     }
 }

@@ -25,6 +25,7 @@ extern {
         Name => lexer::Token::Name(<String>),
         "def" => lexer::Token::Def,
         "if" => lexer::Token::If,
+        "while" => lexer::Token::While,
         "else" => lexer::Token::Else,
         "let" => lexer::Token::Let,
         "true" => lexer::Token::True,
@@ -101,6 +102,10 @@ IfExpr: ExprAst = {
     "if" <cmp_expr: Expr> <exprs: Block> <else_exprs: ("else" <Block>)?> => ExprAst::new_if(<>)
 }
 
+WhileExpr: ExprAst = {
+    "while" <cmp_expr: Expr> <exprs: Block> => ExprAst::new_while(<>)
+}
+
 ExprOp: BinOpAst = {
     "+" => BinOpAst::Add,
     "-" => BinOpAst::Sub,
@@ -122,6 +127,7 @@ Term: ExprAst = {
     "false" => ExprAst::Bool(false),
     "true" => ExprAst::Bool(true),
     <IfExpr>,
+    <WhileExpr>,
     <FunctionCall>,     
     "(" <Expr> ")",
 };
