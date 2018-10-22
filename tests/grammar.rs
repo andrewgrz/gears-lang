@@ -23,6 +23,10 @@ def branching() {
     } else {
         let other_variable = 5;
     };
+
+    while true {
+        let x = 3;
+    };
     
     if true {
         let a = 4 - 3;
