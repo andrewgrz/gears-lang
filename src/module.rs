@@ -183,6 +183,10 @@ impl ModuleBuilder {
         self.opcode(arg_count);
     }
 
+    pub fn load_none(&mut self) {
+        self.opcode(LOAD_NONE);
+    }
+
     pub fn load_bool(&mut self, b: &bool) {
         if *b {
             self.opcode(LOAD_TRUE);

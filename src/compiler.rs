@@ -105,6 +105,8 @@ fn visit_expr(
                     module_builder.end_jump(jump_index);
                 }
                 None => {
+                    let jump_index = module_builder.start_else(jump_index);
+                    module_builder.load_none();
                     module_builder.end_jump(jump_index);
                 }
             }
