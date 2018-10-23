@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 use std::fmt::Error;
 use std::fmt::Formatter;
+use lexer;
 
 // Type Aliases
 pub type Name = String;
@@ -20,7 +21,17 @@ pub enum ModStmtAst {
 #[derive(Debug, Clone)]
 pub enum StmtAst {
     Expr(ExprAst),
-    Assignment { name: String, expr: ExprAst },
+    Assignment { new: bool, name: String, expr: ExprAst },
+}
+
+impl StmtAst {
+    pub fn new_assignment(new: Option<lexer::Token>, name: String, expr: ExprAst) -> StmtAst {
+        StmtAst::Assignment {
+            new: new.is_some(),
+            name: name,
+            expr: expr
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

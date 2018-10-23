@@ -11,7 +11,7 @@ def example(a, b) {
     let a = 4 - 3;
     let b = a * 9;
     let c = sub(a - b);
-    12 * add(a + 4 - add_two(5), b) + c;
+    c = 12 * add(a + 4 - add_two(5), b) + c;
 
     let d = false;
     let e = true;

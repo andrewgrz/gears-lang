@@ -80,7 +80,7 @@ Block: Vec<Box<StmtAst>> = {
 };
 
 Assignment: Box<StmtAst> = {
-    "let" <name: Name> "=" <expr: Expr> => Box::new(StmtAst::Assignment{<>})
+    <new: "let"?> <name: Name> "=" <expr: Expr> => Box::new(StmtAst::new_assignment(<>))
 }
 
 // These are the AST's that can be at a block level
