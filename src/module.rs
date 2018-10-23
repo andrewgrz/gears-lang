@@ -225,3 +225,85 @@ impl Function {
         self.num_args
     }
 }
+
+pub fn disassemble(module: &Module, function: &str) {
+    let opcodes = module.get_function(function).unwrap().get_opcodes();
+
+    let mut ip = 0;
+    let mut cur_instr: u8;
+
+    macro_rules! advance {
+        () => {{
+            cur_instr = opcodes[ip];
+            ip += 1;
+        }};
+    }
+
+    macro_rules! print_code {
+        ($code:expr, $arg_count:expr) => {{
+            print!("{} {}", ip, $code);
+            for _ in 0..$arg_count {
+                advance!();
+                print!(" {}", cur_instr)
+            }
+            println!();
+        }};
+    }
+
+    loop {
+        advance!();
+
+        match cur_instr {
+            RETURN => {
+                print_code!("RETURN", 0);
+                break;
+            },
+            CALL_FUNCTION => {
+                print_code!("CALL_FUNCTION", 2)
+            },
+            JUMP => {
+                print_code!("JUMP", 1)
+            },
+            JUMP_IF_FALSE => {
+                print_code!("JUMP_IF_FALSE", 1)
+            },
+
+            // Binary Opcodes
+            BIN_ADD => {
+                print_code!("BIN_ADD", 0)
+            },
+            BIN_SUB => {
+                print_code!("BIN_SUB", 0)
+            },
+            BIN_MUL => {
+                print_code!("BIN_MUL", 0)
+            },
+            BIN_DIV => {
+                print_code!("BIN_DIV", 0)
+            },
+
+            // Misc Opcodes
+            LOAD_CONST => {
+                print_code!("LOAD_CONST", 1)
+            },
+
+            // Loading and Storing
+            LOAD_FAST => {
+                print_code!("LOAD_FAST", 1)
+            },
+            STORE_FAST => {
+                print_code!("STORE_FAST", 1)
+            },
+            LOAD_TRUE => {
+                print_code!("LOAD_TRUE", 1)
+            },
+            LOAD_FALSE => {
+                print_code!("LOAD_FALSE", 1)
+            },
+            LOAD_NONE => {
+                print_code!("LOAD_NONE", 1)
+            },
+            _ => println!("Unexpected opcode!")
+        }
+    }
+}
