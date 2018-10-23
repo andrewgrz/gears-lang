@@ -64,9 +64,20 @@ fn visit_stmt(
 ) -> Result<(), GearsError> {
     match stmt {
         StmtAst::Expr(e) => visit_expr(e, scope, module_builder)?,
-        StmtAst::Assignment { name, expr } => {
+        StmtAst::Assignment { name, expr, new } => {
             visit_expr(expr, scope, &mut module_builder)?;
-            let index = scope.def_variable(name.clone());
+
+            let index = if *new {
+                scope.def_variable(name.clone())
+            } else {
+                let (symbol, _is_global) = scope.resolve(name);
+
+                match symbol {
+                    Some(e) => *e.get_index(),
+                    None => return Err(GearsError::SymbolNotFound(name.clone()))
+                }
+            };
+
             module_builder.store_fast(index);
         }
     }
