@@ -13,3 +13,11 @@ def return_assignment() {
 
     b
 }
+
+def reassign() {
+    let a = 4;
+    let b = 5;
+    a = a + b;
+
+    a
+}

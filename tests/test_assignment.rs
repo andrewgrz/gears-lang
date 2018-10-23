@@ -3,6 +3,7 @@ extern crate gears_lang;
 use gears_lang::compiler::compile_file;
 use gears_lang::object::GearsObject;
 use gears_lang::vm::execute_function;
+use gears_lang::module::disassemble;
 
 #[test]
 fn assignment() {
@@ -21,5 +22,17 @@ fn return_assignment() {
     assert_eq!(
         execute_function(&module.expect("Test failure"), "return_assignment", vec![]).unwrap(),
         GearsObject::Int(13)
+    );
+}
+
+#[test]
+fn reassignment() {
+    let module = compile_file("tests/files/assignment.gs").expect("Test failure");
+
+    disassemble(&module, "reassign");
+
+    assert_eq!(
+        execute_function(&module, "reassign", vec![]).unwrap(),
+        GearsObject::Int(9)
     );
 }
