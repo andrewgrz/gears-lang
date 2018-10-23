@@ -78,26 +78,7 @@ impl ModuleBuilder {
     }
 
     pub fn finish_function(&mut self) {
-        let mut push_return = false;
-
-        match self.current_fn.as_ref() {
-            Some(cur_fn) => match cur_fn.opcodes.last() {
-                Some(op) => {
-                    if op != &RETURN {
-                        push_return = true;
-                    }
-                }
-                None => {
-                    push_return = true;
-                }
-            },
-            None => {}
-        }
-
-        if push_return {
-            self.opcode(RETURN);
-        }
-
+        self.opcode(RETURN);
         let index = self.module.functions.len();
 
         match self.current_fn.as_mut() {
