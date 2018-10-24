@@ -20,3 +20,11 @@ def five_or_none(test) {
         5
     }
 }
+
+def while_loop() {
+    let a = 1;
+    while a < 5 {
+        a = a + 1;
+    }
+    a
+}

@@ -5,9 +5,10 @@ extern crate cached;
 extern crate lazy_static;
 
 use gears_lang::compiler::compile_file;
-use gears_lang::module::Module;
+use gears_lang::module::{Module, disassemble};
 use gears_lang::object::GearsObject;
 use gears_lang::vm::execute_function;
+
 
 cached!{
     FIB;
@@ -58,5 +59,14 @@ fn test_five_or_none_false() {
     assert_eq!(
         execute_function(&setup(), "five_or_none", vec![GearsObject::None]).unwrap(),
         GearsObject::None
+    );
+}
+
+#[test]
+fn test_simple_while_loop() {
+    disassemble(&setup(), "while_loop");
+    assert_eq!(
+        execute_function(&setup(), "while_loop", vec![]).unwrap(),
+        GearsObject::Int(4)
     );
 }
