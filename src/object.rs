@@ -115,9 +115,9 @@ impl GearsObject {
                         GreaterThanEqual => Ok(Bool(l >= r)),
                     }
                 }
-                _ => Err(create_type_error("less", &self, &other)),
+                _ => Err(create_type_error(op, &self, &other)),
             },
-            _ => Err(create_type_error("less", &self, &other)),
+            _ => Err(create_type_error(op, &self, &other)),
         }
     }
 
