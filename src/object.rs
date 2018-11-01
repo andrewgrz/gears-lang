@@ -11,6 +11,13 @@ fn create_type_error(op: &str, left: &GearsObject, right: &GearsObject) -> Gears
     ))
 }
 
+enum CompareDirection {
+    LessThan,
+    GreaterThan,
+    LessThanEqual,
+    GreaterThanEqual,
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum GearsObject {
     Int(i64),
@@ -65,6 +72,72 @@ impl GearsObject {
             },
             _ => Err(create_type_error("div", &self, &other)),
         }
+    }
+
+    #[inline]
+    fn _equal(self, other: GearsObject) -> bool {
+        use self::GearsObject::*;
+
+        match self {
+            Int(l) => match other {
+                Int(r) => l == r,
+                _ => false
+            }
+            Bool(l) => match other {
+                Bool(r) => l == r,
+                _ => false
+            }
+            None => false
+        }
+    }
+
+    pub fn equal(self, other: GearsObject) -> GearsResult {
+        Ok(GearsObject::Bool(self._equal(other)))
+    }
+
+    pub fn nequal(self, other: GearsObject) -> GearsResult {
+        Ok(GearsObject::Bool(!self._equal(other)))
+    }
+    
+    #[inline]
+    fn compare(self, other: GearsObject, dir: CompareDirection, op: &str) -> GearsResult {
+        use self::GearsObject::*;
+
+        match self {
+            Int(l) => {
+                match other {
+                    Int(r) => {
+                        use self::CompareDirection::*;
+
+                        match dir {
+                            LessThan => Ok(Bool(l < r)),
+                            GreaterThan => Ok(Bool(l > r)),
+                            LessThanEqual => Ok(Bool(l <= r)),
+                            GreaterThanEqual => Ok(Bool(l >= r)),
+                        }
+                        
+                    }
+                    _ => Err(create_type_error("less", &self, &other)),
+                }
+            }
+            _ => Err(create_type_error("less", &self, &other)),
+        }
+    }
+
+    pub fn less(self, other: GearsObject) -> GearsResult {
+        self.compare(other, CompareDirection::LessThan, "<")
+    }
+
+    pub fn greater(self, other: GearsObject) -> GearsResult {
+        self.compare(other, CompareDirection::GreaterThan, ">")
+    }
+
+    pub fn less_eq(self, other: GearsObject) -> GearsResult {
+        self.compare(other, CompareDirection::LessThanEqual, "<=")
+    }
+
+    pub fn greater_eq(self, other: GearsObject) -> GearsResult {
+        self.compare(other, CompareDirection::GreaterThanEqual, ">=")
     }
 
     pub fn get_type_str(&self) -> &str {

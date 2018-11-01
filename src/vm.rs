@@ -60,12 +60,23 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
     loop {
         advance!();
 
+        println!("Running: {}", print_code(cur_instr));
+        println!("{:?}", stack);
+
         match cur_instr {
             RETURN => return Ok(pop!()),
             BIN_ADD => bin_op!(add),
             BIN_SUB => bin_op!(sub),
             BIN_MUL => bin_op!(mul),
             BIN_DIV => bin_op!(div),
+
+            BIN_EQUAL => bin_op!(equal),
+            BIN_NOT_EQUAL => bin_op!(nequal),
+            BIN_LESS_THAN => bin_op!(less),
+            BIN_LESS_THAN_EQUAL => bin_op!(less_eq),
+            BIN_GREATER_THAN => bin_op!(greater),
+            BIN_GREATER_THAN_EQUAL => bin_op!(greater_eq),
+
             LOAD_FAST => {
                 advance!();
 

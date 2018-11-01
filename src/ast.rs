@@ -55,6 +55,12 @@ pub enum BinOpAst {
     Div,
     Add,
     Sub,
+    EqEq,
+    NotEq,
+    LessThan,
+    LessThanEq,
+    GreaterThan,
+    GreaterThanEq,
 }
 
 impl Debug for BinOpAst {
@@ -65,6 +71,12 @@ impl Debug for BinOpAst {
             Div => write!(fmt, "/"),
             Add => write!(fmt, "+"),
             Sub => write!(fmt, "-"),
+            EqEq => write!(fmt, "=="),
+            NotEq => write!(fmt, "!="),
+            LessThan => write!(fmt, "<"),
+            LessThanEq => write!(fmt, "<="),
+            GreaterThan => write!(fmt, ">"),
+            GreaterThanEq => write!(fmt, ">="),
         }
     }
 }

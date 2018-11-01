@@ -131,6 +131,12 @@ fn visit_expr(
                 BinOpAst::Sub => module_builder.op_sub(),
                 BinOpAst::Mul => module_builder.op_mul(),
                 BinOpAst::Div => module_builder.op_div(),
+                BinOpAst::EqEq => module_builder.op_eqeq(),
+                BinOpAst::NotEq => module_builder.op_not_eq(),
+                BinOpAst::LessThan => module_builder.op_less(),
+                BinOpAst::LessThanEq => module_builder.op_less_eq(),
+                BinOpAst::GreaterThan => module_builder.op_greater(),
+                BinOpAst::GreaterThanEq => module_builder.op_greater_eq(),
             }
         }
         ExprAst::FunctionCall { ref name, ref args } => {

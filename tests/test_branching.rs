@@ -67,6 +67,6 @@ fn test_simple_while_loop() {
     disassemble(&setup(), "while_loop");
     assert_eq!(
         execute_function(&setup(), "while_loop", vec![]).unwrap(),
-        GearsObject::Int(4)
+        GearsObject::Int(5)
     );
 }

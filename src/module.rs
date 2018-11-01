@@ -148,6 +148,30 @@ impl ModuleBuilder {
         self.opcode(BIN_DIV);
     }
 
+    pub fn op_eqeq(&mut self) {
+        self.opcode(BIN_EQUAL);
+    }
+
+    pub fn op_not_eq(&mut self) {
+        self.opcode(BIN_EQUAL);
+    }
+
+    pub fn op_less(&mut self) {
+        self.opcode(BIN_LESS_THAN);
+    }
+
+    pub fn op_less_eq(&mut self) {
+        self.opcode(BIN_LESS_THAN_EQUAL);
+    }
+
+    pub fn op_greater(&mut self) {
+        self.opcode(BIN_GREATER_THAN);
+    }
+
+    pub fn op_greater_eq(&mut self) {
+        self.opcode(BIN_GREATER_THAN_EQUAL);
+    }
+
     pub fn store_fast(&mut self, index: u8) {
         self.opcode(STORE_FAST);
         self.opcode(index);
@@ -280,6 +304,24 @@ pub fn disassemble(module: &Module, function: &str) {
             },
             BIN_DIV => {
                 print_code!("BIN_DIV", 0)
+            },
+            BIN_EQUAL => {
+                print_code!("BIN_EQUAL", 0)
+            },
+            BIN_NOT_EQUAL => {
+                print_code!("BIN_NOT_EQUAL", 0)
+            },
+            BIN_LESS_THAN => {
+                print_code!("BIN_LESS_THAN", 0)
+            },
+            BIN_LESS_THAN_EQUAL => {
+                print_code!("BIN_LESS_THAN_EQUAL", 0)
+            },
+            BIN_GREATER_THAN => {
+                print_code!("BIN_GREATER_THAN", 0)
+            },
+            BIN_GREATER_THAN_EQUAL => {
+                print_code!("BIN_GREATER_THAN_EQUAL", 0)
             },
 
             // Misc Opcodes
