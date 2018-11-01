@@ -47,6 +47,12 @@ pub enum Token {
     SemiColon,
     Colon,
     Eq,
+    EqEq,
+    NotEq,
+    LessThan,
+    LessThanEq,
+    GreaterThan,
+    GreaterThanEq,
     Plus,
     Minus,
     Star,
@@ -100,7 +106,61 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
             '}' => token!(RBracket, 1),
             ';' => token!(SemiColon, 1),
             ':' => token!(Colon, 1),
-            '=' => token!(Eq, 1),
+            '=' => {
+                lookahead = chars.next();
+                if let Some(c) = lookahead {
+                    match c {
+                        '=' => token!(EqEq, 2),
+                        _ => {
+                            token!(Eq, 1);
+                            continue;
+                        }
+                    }
+                } else {
+                    token!(Eq, 1)
+                }
+            },
+            '!' => {
+                lookahead = chars.next();
+                if let Some(c) = lookahead {
+                    match c {
+                        '=' => token!(NotEq, 2),
+                        _ => {
+                            tokens.push(Err(LexicalError::UnknownToken(c)))
+                        }
+                    }
+                } else {
+                    tokens.push(Err(LexicalError::UnknownToken(c)))
+                }
+            },
+            '<' => {
+                lookahead = chars.next();
+                if let Some(c) = lookahead {
+                    match c {
+                        '=' => token!(LessThanEq, 2),
+                        _ => {
+                            token!(LessThan, 1);
+                            continue;
+                        }
+                    }
+                } else {
+                    token!(LessThan, 1)
+                }
+            },
+            '>' => {
+                lookahead = chars.next();
+                if let Some(c) = lookahead {
+                    match c {
+                        '=' => token!(GreaterThanEq, 2),
+                        _ => {
+                            token!(GreaterThan, 1);
+                            continue;
+                        }
+                    }
+                } else {
+                    token!(GreaterThan, 1)
+                }
+            },
             '+' => token!(Plus, 1),
             '-' => token!(Minus, 1),
             '*' => token!(Star, 1),
@@ -207,7 +267,7 @@ mod tests {
     }
 
     #[test]
-    fn test_single_char() {
+    fn test_single_token() {
         use super::Token::*;
 
         expect!(",", vec![Comma]);
@@ -218,6 +278,12 @@ mod tests {
         expect!(";", vec![SemiColon]);
         expect!(":", vec![Colon]);
         expect!("=", vec![Eq]);
+        expect!("==", vec![EqEq]);
+        expect!("!=", vec![NotEq]);
+        expect!("<", vec![LessThan]);
+        expect!("<=", vec![LessThanEq]);
+        expect!(">", vec![GreaterThan]);
+        expect!(">=", vec![GreaterThanEq]);
         expect!("+", vec![Plus]);
         expect!("-", vec![Minus]);
         expect!("*", vec![Star]);
