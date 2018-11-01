@@ -21,6 +21,12 @@ extern {
         ":" => lexer::Token::Colon,
         "," => lexer::Token::Comma,
         "=" => lexer::Token::Eq,
+        "==" => lexer::Token::EqEq,
+        "!=" => lexer::Token::NotEq,
+        "<" => lexer::Token::LessThan,
+        "<=" => lexer::Token::LessThanEq,
+        ">" => lexer::Token::GreaterThan,
+        ">=" => lexer::Token::GreaterThanEq,
         Integer => lexer::Token::Integer(<i64>),
         Name => lexer::Token::Name(<String>),
         "def" => lexer::Token::Def,
@@ -89,11 +95,6 @@ Statement: Box<StmtAst> = {
     <Expr> => Box::new(StmtAst::Expr(<>)),
 }
 
-Expr: ExprAst = {
-    <Expr> <ExprOp> <Factor> => ExprAst::new_op(<>),
-    <Factor>,
-};
-
 FunctionCall: ExprAst = {
     <name: Name> "(" <args: FnArgs> ")" => ExprAst::FunctionCall{<>}
 }
@@ -105,6 +106,25 @@ IfExpr: ExprAst = {
 WhileExpr: ExprAst = {
     "while" <cmp_expr: Expr> <exprs: Block> => ExprAst::new_while(<>)
 }
+
+CompareOp: BinOpAst = {
+    "<" => BinOpAst::LessThan,
+    ">" => BinOpAst::GreaterThan,
+    "==" => BinOpAst::EqEq,
+    "!=" => BinOpAst::NotEq,
+    ">=" => BinOpAst::GreaterThanEq,
+    "<=" => BinOpAst::LessThanEq,
+};
+
+Expr: ExprAst = {
+    Expr CompareOp AddExpr => ExprAst::new_op(<>),
+    AddExpr,
+};
+
+AddExpr: ExprAst = {
+    AddExpr ExprOp Factor => ExprAst::new_op(<>),
+    Factor,
+};
 
 ExprOp: BinOpAst = {
     "+" => BinOpAst::Add,

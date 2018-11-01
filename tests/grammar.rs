@@ -24,8 +24,9 @@ def branching() {
         let other_variable = 5;
     };
 
-    while true {
-        let x = 3;
+    let x = 3;
+    while x > 5 {
+        x = x + 1;
     };
     
     if true {
