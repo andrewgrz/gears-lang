@@ -276,7 +276,7 @@ pub fn disassemble(module: &Module, function: &str) {
 
     macro_rules! print_code {
         ($code:expr, $arg_count:expr) => {{
-            print!("{} {}", ip, $code);
+            print!("{} {}", ip - 1, $code);
             for _ in 0..$arg_count {
                 advance!();
                 print!(" {}", cur_instr)
