@@ -120,6 +120,10 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
                 advance!();
                 ip += cur_instr as usize;
             },
+            JUMP_ABSOLUTE => {
+                cur_instr = opcodes[ip];
+                ip = cur_instr as usize;
+            },
             JUMP_IF_FALSE => {
                 advance!();
                 if !pop!().as_bool() {

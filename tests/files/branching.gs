@@ -25,6 +25,6 @@ def while_loop() {
     let a = 1;
     while a < 5 {
         a = a + 1;
-    }
+    };
     a
 }

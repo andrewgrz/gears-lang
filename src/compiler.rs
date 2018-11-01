@@ -57,6 +57,18 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
     Ok(module_builder.build())
 }
 
+fn visit_block(
+    exprs: &Vec<Box<StmtAst>>,
+    scope: &mut SymbolTable,
+    mut module_builder: &mut ModuleBuilder,
+) -> Result<(), GearsError> {
+    let mut local_scope = (&scope).push();
+    for stmt in exprs {
+        visit_stmt(stmt, &mut local_scope, &mut module_builder)?;
+    }
+    Ok(())
+}
+
 fn visit_stmt(
     stmt: &StmtAst,
     scope: &mut SymbolTable,
@@ -100,11 +112,7 @@ fn visit_expr(
         } => {
             visit_expr(cmp_expr, scope, &mut module_builder)?;
             let jump_index = module_builder.start_jump_if_false();
-            let mut local_scope = (&scope).push();
-
-            for stmt in exprs {
-                visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
-            }
+            visit_block(exprs, scope, &mut module_builder)?;
 
             match else_exprs {
                 Some(exprs) => {
@@ -121,6 +129,13 @@ fn visit_expr(
                     module_builder.end_jump(jump_index);
                 }
             }
+        }
+        ExprAst::While{cmp_expr, exprs} => {
+            let loop_index = module_builder.start_loop_check();
+            visit_expr(cmp_expr, scope, &mut module_builder)?;
+            let jump_index = module_builder.start_jump_if_false();
+            visit_block(exprs, scope, &mut module_builder)?;
+            module_builder.end_loop(loop_index, jump_index);
         }
         ExprAst::Op(left, op, right) => {
             visit_expr(left, scope, &mut module_builder)?;

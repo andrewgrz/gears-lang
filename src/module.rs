@@ -200,6 +200,17 @@ impl ModuleBuilder {
         }
     }
 
+    pub fn start_loop_check(&mut self) -> usize {
+        self.last_index()
+    }
+
+    pub fn end_loop(&mut self, loop_index: usize, jump_index: usize) {
+        self.opcode(JUMP_ABSOLUTE);
+        self.opcode(loop_index as u8 + 1);
+        let cur_index = self.last_index();
+        self.set_opcode_at(jump_index, (cur_index - jump_index) as u8);
+    }
+
     pub fn start_jump_if_false(&mut self) -> usize {
         self.opcode(JUMP_IF_FALSE);
         self.opcode(0); // Placeholder
@@ -288,6 +299,9 @@ pub fn disassemble(module: &Module, function: &str) {
             JUMP => {
                 print_code!("JUMP", 1)
             },
+            JUMP_ABSOLUTE => {
+                print_code!("JUMP_ABSOLUTE", 1)
+            }
             JUMP_IF_FALSE => {
                 print_code!("JUMP_IF_FALSE", 1)
             },
