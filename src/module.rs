@@ -153,7 +153,7 @@ impl ModuleBuilder {
     }
 
     pub fn op_not_eq(&mut self) {
-        self.opcode(BIN_EQUAL);
+        self.opcode(BIN_NOT_EQUAL);
     }
 
     pub fn op_less(&mut self) {

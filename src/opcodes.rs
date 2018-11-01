@@ -6,6 +6,7 @@ macro_rules! gen_opcodes {
             pub const $code: u8 = $index;
         )*
         /// Prints out the oppcode for debugging purposes
+        #[allow(dead_code)]
         pub fn print_code(code: u8) -> &'static str {
             match code {
                 $(

@@ -60,8 +60,8 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
     loop {
         advance!();
 
-        println!("Running: {}", print_code(cur_instr));
-        println!("{:?}", stack);
+        // println!("Running: {}", print_code(cur_instr));
+        // println!("{:?}", stack);
 
         match cur_instr {
             RETURN => return Ok(pop!()),
