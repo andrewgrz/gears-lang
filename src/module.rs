@@ -292,74 +292,34 @@ pub fn disassemble(module: &Module, function: &str) {
             RETURN => {
                 print_code!("RETURN", 0);
                 break;
-            },
-            CALL_FUNCTION => {
-                print_code!("CALL_FUNCTION", 2)
-            },
-            JUMP => {
-                print_code!("JUMP", 1)
-            },
-            JUMP_ABSOLUTE => {
-                print_code!("JUMP_ABSOLUTE", 1)
             }
-            JUMP_IF_FALSE => {
-                print_code!("JUMP_IF_FALSE", 1)
-            },
+            CALL_FUNCTION => print_code!("CALL_FUNCTION", 2),
+            JUMP => print_code!("JUMP", 1),
+            JUMP_ABSOLUTE => print_code!("JUMP_ABSOLUTE", 1),
+            JUMP_IF_FALSE => print_code!("JUMP_IF_FALSE", 1),
 
             // Binary Opcodes
-            BIN_ADD => {
-                print_code!("BIN_ADD", 0)
-            },
-            BIN_SUB => {
-                print_code!("BIN_SUB", 0)
-            },
-            BIN_MUL => {
-                print_code!("BIN_MUL", 0)
-            },
-            BIN_DIV => {
-                print_code!("BIN_DIV", 0)
-            },
-            BIN_EQUAL => {
-                print_code!("BIN_EQUAL", 0)
-            },
-            BIN_NOT_EQUAL => {
-                print_code!("BIN_NOT_EQUAL", 0)
-            },
-            BIN_LESS_THAN => {
-                print_code!("BIN_LESS_THAN", 0)
-            },
-            BIN_LESS_THAN_EQUAL => {
-                print_code!("BIN_LESS_THAN_EQUAL", 0)
-            },
-            BIN_GREATER_THAN => {
-                print_code!("BIN_GREATER_THAN", 0)
-            },
-            BIN_GREATER_THAN_EQUAL => {
-                print_code!("BIN_GREATER_THAN_EQUAL", 0)
-            },
+            BIN_ADD => print_code!("BIN_ADD", 0),
+            BIN_SUB => print_code!("BIN_SUB", 0),
+            BIN_MUL => print_code!("BIN_MUL", 0),
+            BIN_DIV => print_code!("BIN_DIV", 0),
+            BIN_EQUAL => print_code!("BIN_EQUAL", 0),
+            BIN_NOT_EQUAL => print_code!("BIN_NOT_EQUAL", 0),
+            BIN_LESS_THAN => print_code!("BIN_LESS_THAN", 0),
+            BIN_LESS_THAN_EQUAL => print_code!("BIN_LESS_THAN_EQUAL", 0),
+            BIN_GREATER_THAN => print_code!("BIN_GREATER_THAN", 0),
+            BIN_GREATER_THAN_EQUAL => print_code!("BIN_GREATER_THAN_EQUAL", 0),
 
             // Misc Opcodes
-            LOAD_CONST => {
-                print_code!("LOAD_CONST", 1)
-            },
+            LOAD_CONST => print_code!("LOAD_CONST", 1),
 
             // Loading and Storing
-            LOAD_FAST => {
-                print_code!("LOAD_FAST", 1)
-            },
-            STORE_FAST => {
-                print_code!("STORE_FAST", 1)
-            },
-            LOAD_TRUE => {
-                print_code!("LOAD_TRUE", 1)
-            },
-            LOAD_FALSE => {
-                print_code!("LOAD_FALSE", 1)
-            },
-            LOAD_NONE => {
-                print_code!("LOAD_NONE", 1)
-            },
-            _ => println!("Unexpected opcode!")
+            LOAD_FAST => print_code!("LOAD_FAST", 1),
+            STORE_FAST => print_code!("STORE_FAST", 1),
+            LOAD_TRUE => print_code!("LOAD_TRUE", 1),
+            LOAD_FALSE => print_code!("LOAD_FALSE", 1),
+            LOAD_NONE => print_code!("LOAD_NONE", 1),
+            _ => println!("Unexpected opcode!"),
         }
     }
 }

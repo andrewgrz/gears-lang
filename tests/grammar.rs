@@ -50,10 +50,10 @@ fn test_grammar() {
                             for (line_num, line) in FULL_GRAMMAR_EXAMPLE.lines().enumerate() {
                                 if line_num + 1 == tok.0.line() {
                                     println!("{}", line);
-                                    for _ in 0 .. (tok.0.column() - 1) {
+                                    for _ in 0..(tok.0.column() - 1) {
                                         print!(" ")
                                     }
-                                    for _ in 0 .. (tok.2.column() - tok.0.column() ) {
+                                    for _ in 0..(tok.2.column() - tok.0.column()) {
                                         print!("-")
                                     }
                                 }

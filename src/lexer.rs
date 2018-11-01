@@ -1,6 +1,5 @@
-
-use std::str::FromStr;
 use std::fmt;
+use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum LexicalError {
@@ -93,7 +92,11 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
         ($tok:ident, $size: expr) => {{
             let start = column;
             column += $size;
-            tokens.push(Ok((Span::new(line, start), Token::$tok, Span::new(line, column))));
+            tokens.push(Ok((
+                Span::new(line, start),
+                Token::$tok,
+                Span::new(line, column),
+            )));
         }};
     }
 
@@ -119,20 +122,18 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
                 } else {
                     token!(Eq, 1)
                 }
-            },
+            }
             '!' => {
                 lookahead = chars.next();
                 if let Some(c) = lookahead {
                     match c {
                         '=' => token!(NotEq, 2),
-                        _ => {
-                            tokens.push(Err(LexicalError::UnknownToken(c)))
-                        }
+                        _ => tokens.push(Err(LexicalError::UnknownToken(c))),
                     }
                 } else {
                     tokens.push(Err(LexicalError::UnknownToken(c)))
                 }
-            },
+            }
             '<' => {
                 lookahead = chars.next();
                 if let Some(c) = lookahead {
@@ -146,7 +147,7 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
                 } else {
                     token!(LessThan, 1)
                 }
-            },
+            }
             '>' => {
                 lookahead = chars.next();
                 if let Some(c) = lookahead {
@@ -160,7 +161,7 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
                 } else {
                     token!(GreaterThan, 1)
                 }
-            },
+            }
             '+' => token!(Plus, 1),
             '-' => token!(Minus, 1),
             '*' => token!(Star, 1),
@@ -198,12 +199,12 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
             '\n' => {
                 line += 1;
                 column = 1;
-            },
+            }
             '#' => {
                 let (_, next) = take_while(c, &mut chars, |c| c != '\n');
                 lookahead = next;
                 continue;
-            },
+            }
             _ => tokens.push(Err(LexicalError::UnknownToken(c))),
         }
 
@@ -326,7 +327,12 @@ mod tests {
     fn test_spanning() {
         use super::Token::*;
 
-        fn get_token(token: Token, line: usize, start: usize, end: usize) -> Result<(Span, Token, Span), LexicalError> {
+        fn get_token(
+            token: Token,
+            line: usize,
+            start: usize,
+            end: usize,
+        ) -> Result<(Span, Token, Span), LexicalError> {
             Ok((Span::new(line, start), token, Span::new(line, end)))
         }
 

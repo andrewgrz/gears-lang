@@ -1,5 +1,5 @@
 use lalrpop_util::ParseError;
-use lexer::{Token, Span, LexicalError};
+use lexer::{LexicalError, Span, Token};
 use std::io;
 
 #[derive(Debug)]
@@ -40,8 +40,11 @@ impl<'a> From<ParseError<Span, Token, LexicalError>> for GearsError {
             },
             ParseError::UnrecognizedToken { token, expected } => {
                 let (mut token_msg, location) = match token {
-                    Some(tok) => (format!("Unexpected token ({:?}) at {}", tok.1, tok.0), tok.0),
-                    None => (format!("Unexpected EOF token"), Span::new(0,0)),
+                    Some(tok) => (
+                        format!("Unexpected token ({:?}) at {}", tok.1, tok.0),
+                        tok.0,
+                    ),
+                    None => (format!("Unexpected EOF token"), Span::new(0, 0)),
                 };
 
                 token_msg += &format!("Expected one of: {:?}", expected);
@@ -56,7 +59,7 @@ impl<'a> From<ParseError<Span, Token, LexicalError>> for GearsError {
                 location: token.0,
             },
             ParseError::User { error } => GearsError::ParseError {
-                location: Span::new(0 , 0),
+                location: Span::new(0, 0),
                 message: format!("{:?}", error),
             },
         }

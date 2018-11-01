@@ -81,13 +81,13 @@ impl GearsObject {
         match self {
             Int(l) => match other {
                 Int(r) => l == r,
-                _ => false
-            }
+                _ => false,
+            },
             Bool(l) => match other {
                 Bool(r) => l == r,
-                _ => false
-            }
-            None => false
+                _ => false,
+            },
+            None => false,
         }
     }
 
@@ -98,28 +98,25 @@ impl GearsObject {
     pub fn nequal(self, other: GearsObject) -> GearsResult {
         Ok(GearsObject::Bool(!self._equal(other)))
     }
-    
+
     #[inline]
     fn compare(self, other: GearsObject, dir: CompareDirection, op: &str) -> GearsResult {
         use self::GearsObject::*;
 
         match self {
-            Int(l) => {
-                match other {
-                    Int(r) => {
-                        use self::CompareDirection::*;
+            Int(l) => match other {
+                Int(r) => {
+                    use self::CompareDirection::*;
 
-                        match dir {
-                            LessThan => Ok(Bool(l < r)),
-                            GreaterThan => Ok(Bool(l > r)),
-                            LessThanEqual => Ok(Bool(l <= r)),
-                            GreaterThanEqual => Ok(Bool(l >= r)),
-                        }
-                        
+                    match dir {
+                        LessThan => Ok(Bool(l < r)),
+                        GreaterThan => Ok(Bool(l > r)),
+                        LessThanEqual => Ok(Bool(l <= r)),
+                        GreaterThanEqual => Ok(Bool(l >= r)),
                     }
-                    _ => Err(create_type_error("less", &self, &other)),
                 }
-            }
+                _ => Err(create_type_error("less", &self, &other)),
+            },
             _ => Err(create_type_error("less", &self, &other)),
         }
     }

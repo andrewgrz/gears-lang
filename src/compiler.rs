@@ -1,8 +1,8 @@
 use ast::*;
 use errors::GearsError;
+use lexer;
 use module::{Module, ModuleBuilder};
 use parser;
-use lexer;
 use std::fs::File;
 use std::io::prelude::*;
 use symbol::{SymbolTable, SymbolType};
@@ -86,7 +86,7 @@ fn visit_stmt(
 
                 match symbol {
                     Some(e) => *e.get_index(),
-                    None => return Err(GearsError::SymbolNotFound(name.clone()))
+                    None => return Err(GearsError::SymbolNotFound(name.clone())),
                 }
             };
 
@@ -130,7 +130,7 @@ fn visit_expr(
                 }
             }
         }
-        ExprAst::While{cmp_expr, exprs} => {
+        ExprAst::While { cmp_expr, exprs } => {
             let loop_index = module_builder.start_loop_check();
             visit_expr(cmp_expr, scope, &mut module_builder)?;
             let jump_index = module_builder.start_jump_if_false();
@@ -175,7 +175,7 @@ fn visit_expr(
                     &SymbolType::Variable => {
                         // TODO: return location
                         return Err(GearsError::ParseError {
-                            location: lexer::Span::new(0,0),
+                            location: lexer::Span::new(0, 0),
                             message: format!("{} is not callable", name),
                         });
                     }
