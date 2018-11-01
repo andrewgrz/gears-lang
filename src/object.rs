@@ -157,3 +157,15 @@ impl GearsObject {
         }
     }
 }
+
+impl From<i64> for GearsObject {
+    fn from(i: i64) -> GearsObject {
+        GearsObject::Int(i)
+    }
+}
+
+impl From<bool> for GearsObject {
+    fn from(b: bool) -> GearsObject {
+        GearsObject::Bool(b)
+    }
+}
