@@ -5,7 +5,7 @@ extern crate cached;
 extern crate lazy_static;
 
 use gears_lang::compiler::compile_file;
-use gears_lang::module::{disassemble, Module};
+use gears_lang::module::Module;
 use gears_lang::object::GearsObject;
 use gears_lang::vm::execute_function;
 
