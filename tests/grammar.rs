@@ -28,6 +28,10 @@ def branching() {
     while x > 5 {
         x = x + 1;
     };
+
+    for x in 0 to 10 {
+        let c = x + 1;
+    }; 
     
     if true {
         let a = 4 - 3;

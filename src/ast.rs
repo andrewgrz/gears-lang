@@ -104,6 +104,11 @@ pub enum ExprAst {
         cmp_expr: Box<ExprAst>,
         exprs: Stmts,
     },
+    For {
+        name: String,
+        range: RangeAst,
+        exprs: Stmts,
+    },
 }
 
 impl ExprAst {
@@ -124,5 +129,25 @@ impl ExprAst {
             cmp_expr: Box::new(cmp_expr),
             exprs: exprs,
         }
+    }
+
+    pub fn new_for(name: String, range: RangeAst, exprs: Stmts) -> ExprAst {
+        ExprAst::For {
+            name: name,
+            range: range,
+            exprs: exprs,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RangeAst {
+    start: i64,
+    end: i64,
+}
+
+impl RangeAst {
+    pub fn new(start: i64, end: i64) -> RangeAst {
+        RangeAst { start: start, end: end }
     }
 }

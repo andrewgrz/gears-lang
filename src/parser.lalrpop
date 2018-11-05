@@ -32,6 +32,9 @@ extern {
         "def" => lexer::Token::Def,
         "if" => lexer::Token::If,
         "while" => lexer::Token::While,
+        "for" => lexer::Token::For,
+        "in" => lexer::Token::In,
+        "to" => lexer::Token::To,
         "else" => lexer::Token::Else,
         "let" => lexer::Token::Let,
         "true" => lexer::Token::True,
@@ -107,6 +110,14 @@ WhileExpr: ExprAst = {
     "while" <cmp_expr: Expr> <exprs: Block> => ExprAst::new_while(<>)
 }
 
+ForExpr: ExprAst = {
+    "for" <name: Name> "in" <range: RangeExpr> <exprs: Block> => ExprAst::new_for(<>)
+}
+
+RangeExpr: RangeAst = {
+    <start: Integer> "to" <end: Integer> => RangeAst::new(<>)
+}
+
 CompareOp: BinOpAst = {
     "<" => BinOpAst::LessThan,
     ">" => BinOpAst::GreaterThan,
@@ -148,6 +159,7 @@ Term: ExprAst = {
     "true" => ExprAst::Bool(true),
     <IfExpr>,
     <WhileExpr>,
+    <ForExpr>,
     <FunctionCall>,     
     "(" <Expr> ")",
 };

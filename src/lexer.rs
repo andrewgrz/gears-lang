@@ -69,6 +69,9 @@ pub enum Token {
     True,
     False,
     While,
+    For,
+    In,
+    To,
 }
 
 pub type Spanned<Token, Loc, Error> = Result<(Loc, Token, Loc), Error>;
@@ -182,6 +185,9 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
                     "true" => token!(True, len),
                     "false" => token!(False, len),
                     "while" => token!(While, len),
+                    "for" => token!(For, len),
+                    "in" => token!(In, len),
+                    "to" => token!(To, len),
                     _ => token_data!(Token::Name(tmp), len),
                 }
 
