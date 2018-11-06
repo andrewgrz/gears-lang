@@ -11,6 +11,14 @@ fn create_type_error(op: &str, left: &GearsObject, right: &GearsObject) -> Gears
     ))
 }
 
+fn create_type_error_unary(op: &str, left: &GearsObject) -> GearsError {
+    GearsError::TypeError(format!(
+        "TypeError: Unable to perform {} on {}",
+        op,
+        left.get_type_str(),
+    ))
+}
+
 enum CompareDirection {
     LessThan,
     GreaterThan,
@@ -26,6 +34,15 @@ pub enum GearsObject {
 }
 
 impl GearsObject {
+    pub fn inc(self) -> GearsResult {
+        use self::GearsObject::*;
+
+        match self {
+            Int(l) => Ok(Int(l + 1)),
+            _ => Err(create_type_error_unary("increment", &self)),
+        }
+    }
+
     pub fn add(self, other: GearsObject) -> GearsResult {
         use self::GearsObject::*;
 
