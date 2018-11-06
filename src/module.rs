@@ -229,6 +229,10 @@ impl ModuleBuilder {
         let cur_index = self.last_index();
         self.set_opcode_at(index, (cur_index - index) as u8);
     }
+
+    pub fn inc_one(&mut self) {
+        self.opcode(INC_ONE);
+    }
 }
 
 /// A compiled function
@@ -319,6 +323,9 @@ pub fn disassemble(module: &Module, function: &str) {
             LOAD_TRUE => print_code!("LOAD_TRUE", 1),
             LOAD_FALSE => print_code!("LOAD_FALSE", 1),
             LOAD_NONE => print_code!("LOAD_NONE", 1),
+
+            // Unary
+            INC_ONE => print_code!("INC_ONE", 0),
             _ => println!("Unexpected opcode!"),
         }
     }
