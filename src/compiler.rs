@@ -137,6 +137,29 @@ fn visit_expr(
             visit_block(exprs, scope, &mut module_builder)?;
             module_builder.end_loop(loop_index, jump_index);
         }
+        ExprAst::For { name, range, exprs } => {
+            // Push a loop level scope and define the name into that scope
+            let mut local_scope = (&scope).push();
+            let name_index = local_scope.def_variable(name.clone());
+            module_builder.load_int(range.start());
+            module_builder.store_fast(name_index);
+            let loop_index = module_builder.start_loop_check();
+
+            let cmp_expr = &ExprAst::new_op(
+                ExprAst::Variable(name.clone()),
+                BinOpAst::LessThan,
+                ExprAst::Integer(range.end()),
+            );
+
+            visit_expr(cmp_expr, &mut local_scope, &mut module_builder)?;
+
+            let jump_index = module_builder.start_jump_if_false();
+            visit_block(exprs, &mut local_scope, &mut module_builder)?;
+            module_builder.load_fast(name_index);
+            module_builder.inc_one();
+            module_builder.store_fast(name_index);
+            module_builder.end_loop(loop_index, jump_index);
+        }
         ExprAst::Op(left, op, right) => {
             visit_expr(left, scope, &mut module_builder)?;
             visit_expr(right, scope, &mut module_builder)?;
