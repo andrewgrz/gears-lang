@@ -60,6 +60,7 @@ pub enum Token {
     // Data
     Name(String),
     Integer(i64),
+    Str(String),
 
     // Keywords
     Def,
@@ -194,6 +195,26 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
                 continue;
             }
 
+            '"' => {
+                if let Some(c) = chars.next() {
+                    let (tmp, _) = take_while_lookback(c, &mut chars, |c, l| c != '"' && l != '\\');
+                    token_data!(Token::Str(tmp), tmp.len());
+                    // Not continueing will eat the ending "
+                } else {
+                    tokens.push(Err(LexicalError::UnknownToken(c)))
+                }
+            }
+
+            '\'' => {
+                if let Some(c) = chars.next() {
+                    let (tmp, _) = take_while_lookback(c, &mut chars, |c, l| c != '\'' && l != '\\');
+                    token_data!(Token::Str(tmp), tmp.len());
+                    // Not continueing will eat the ending "
+                } else {
+                    tokens.push(Err(LexicalError::UnknownToken(c)))
+                }
+            }
+
             _ if c.is_digit(10) => {
                 let (tmp, next) = take_while(c, &mut chars, |c| c.is_digit(10));
                 lookahead = next;
@@ -236,6 +257,28 @@ where
         }
 
         buf.push(c);
+    }
+
+    return (buf, None);
+}
+
+fn take_while_lookback<C, F>(c0: char, chars: &mut C, f: F) -> (String, Option<char>)
+where
+    C: Iterator<Item = char>,
+    F: Fn(char, char) -> bool,
+{
+    let mut buf = String::new();
+    let mut l = c0;
+
+    buf.push(c0);
+
+    while let Some(c) = chars.next() {
+        if !f(c, l) {
+            return (buf, Some(c));
+        }
+
+        buf.push(c);
+        l = c;
     }
 
     return (buf, None);
@@ -295,6 +338,8 @@ mod tests {
         expect!("-", vec![Minus]);
         expect!("*", vec![Star]);
         expect!("/", vec![Slash]);
+        expect!("\"test\"", vec![Str("test".to_owned())]);
+        expect!("'test'", vec![Str("test".to_owned())]);
     }
 
     #[test]
