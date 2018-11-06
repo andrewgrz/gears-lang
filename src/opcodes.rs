@@ -45,5 +45,8 @@ gen_opcodes!(
     STORE_FAST: 31,
     LOAD_TRUE: 32,
     LOAD_FALSE: 33,
-    LOAD_NONE: 34
+    LOAD_NONE: 34,
+
+    // Unary Operations
+    INC_ONE: 40
 );
