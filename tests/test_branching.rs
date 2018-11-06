@@ -69,3 +69,12 @@ fn test_simple_while_loop() {
         GearsObject::Int(5)
     );
 }
+
+#[test]
+fn test_simple_for_loop() {
+    disassemble(&setup(), "for_loop");
+    assert_eq!(
+        execute_function(&setup(), "for_loop", vec![]).unwrap(),
+        GearsObject::Int(19)
+    );
+}

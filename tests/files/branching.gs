@@ -28,3 +28,12 @@ def while_loop() {
     };
     a
 }
+
+def for_loop() {
+    let result = 10;
+
+    for x in 1 to 10 {
+        result = result + 1;
+    };
+    result
+}
