@@ -94,7 +94,13 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
             }
             STORE_FAST => {
                 advance!();
-                args.insert(cur_instr as usize, pop!());
+                let index = cur_instr as usize;
+
+                if args.len() > index {
+                    args[index] = pop!();
+                } else {
+                    args.insert(index, pop!());
+                }
             }
             LOAD_CONST => {
                 advance!();
