@@ -50,6 +50,13 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
         }};
     }
 
+    macro_rules! unary_op {
+        ($op:ident) => {{
+            let a = pop!();
+            push!(a.$op()?);
+        }};
+    }
+
     macro_rules! advance {
         () => {{
             cur_instr = opcodes[ip];
@@ -129,6 +136,9 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
                 if !pop!().as_bool() {
                     ip += cur_instr as usize; 
                 }
+            },
+            INC_ONE => {
+                unary_op!(inc);
             }
             _ => return Err(GearsError::InternalCompilerError(format!("Unexpected Opcode: {:?}", cur_instr))),
         }
