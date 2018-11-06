@@ -148,6 +148,17 @@ pub struct RangeAst {
 
 impl RangeAst {
     pub fn new(start: i64, end: i64) -> RangeAst {
-        RangeAst { start: start, end: end }
+        RangeAst {
+            start: start,
+            end: end,
+        }
+    }
+
+    pub fn start(&self) -> i64 {
+        self.start
+    }
+
+    pub fn end(&self) -> i64 {
+        self.end
     }
 }
