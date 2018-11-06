@@ -1,11 +1,12 @@
 
 use std::collections::HashMap;
 
+#[derive(Debug, Clone)]
 pub enum SymbolType {
     Function,
     Variable,
 }
-
+#[derive(Debug, Clone)]
 pub struct Symbol {
     sym_type: SymbolType,
     index: u8,
@@ -55,14 +56,26 @@ impl <'a> SymbolTable<'a> {
         }
     }
 
+    pub fn is_global(&self) -> bool {
+        self.parent.is_none()
+    }
+
+    fn get_next_index(&self) -> u8 {
+        if self.parent.is_none() || self.parent.unwrap().is_global() {
+            self.symbols.len() as u8
+        } else {
+            self.parent.unwrap().get_next_index() + self.symbols.len() as u8
+        }
+    }
+
     pub fn def_fn(&mut self, name: String) -> u8 {
-        let index = self.symbols.len() as u8;
+        let index = self.get_next_index();
         self.symbols.insert(name, Symbol::new_fn(index));
         index
     }
 
     pub fn def_variable(&mut self, name: String) -> u8 {
-        let index = self.symbols.len() as u8;
+        let index = self.get_next_index();
         self.symbols.insert(name, Symbol::new_var(index));
         index
     }
