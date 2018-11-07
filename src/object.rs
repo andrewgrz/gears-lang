@@ -28,6 +28,7 @@ enum CompareDirection {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum GearsObject {
+    Str(String),
     Int(i64),
     Bool(bool),
     None,
@@ -49,6 +50,10 @@ impl GearsObject {
         match self {
             Int(l) => match other {
                 Int(r) => Ok(Int(l + r)),
+                _ => Err(create_type_error("add", &self, &other)),
+            },
+            Str(ref l) => match other {
+                Str(ref r) => Ok(Str(l.to_owned() + r)),
                 _ => Err(create_type_error("add", &self, &other)),
             },
             _ => Err(create_type_error("add", &self, &other)),
@@ -104,6 +109,10 @@ impl GearsObject {
                 Bool(r) => l == r,
                 _ => false,
             },
+            Str(l) => match other {
+                Str(r) => l == r,
+                _ => false,
+            }
             None => false,
         }
     }
@@ -160,6 +169,7 @@ impl GearsObject {
         match self {
             Int(_) => "Integer",
             Bool(_) => "Bool",
+            Str(_) => "String",
             None => "NoneType",
         }
     }
@@ -170,6 +180,7 @@ impl GearsObject {
         match self {
             Bool(b) => *b,
             Int(i) => *i != 0,
+            Str(s) => s.len() > 0,
             None => false,
         }
     }
