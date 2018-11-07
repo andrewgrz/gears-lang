@@ -42,11 +42,12 @@ impl StmtAst {
 #[derive(Debug, Clone)]
 pub struct ArgAst {
     name: Name,
+    arg_types: Vec<Name>,
 }
 
 impl ArgAst {
-    pub fn new(name: Name) -> ArgAst {
-        ArgAst { name: name }
+    pub fn new(name: Name, arg_type: Vec<Name>) -> ArgAst {
+        ArgAst { name: name, arg_types: arg_type }
     }
 
     pub fn name(&self) -> &Name {

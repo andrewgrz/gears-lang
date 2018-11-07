@@ -21,6 +21,7 @@ extern {
         "}" => lexer::Token::RBracket,
         ";" => lexer::Token::SemiColon,
         ":" => lexer::Token::Colon,
+        "|" => lexer::Token::Pipe, 
         "," => lexer::Token::Comma,
         "=" => lexer::Token::Eq,
         "==" => lexer::Token::EqEq,
@@ -66,6 +67,17 @@ SemiColon<T>: Vec<T> = {
     }
 };
 
+Pipe<T>: Vec<T> = {
+    <v:(<T> "|")*> <e:T?> => match e {
+        None=> v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
+
 pub Module = ModStmtAst*;
 
 ModStmtAst: Box<ModStmtAst> = {
@@ -76,14 +88,14 @@ FunctionDef: Box<ModStmtAst> = {
     "def" <name: Name> "(" <args: Args> ")" <exprs: Block> => Box::new(ModStmtAst::FunctionDef{<>})
 };
 
-
 Args = Comma<Arg>;
 FnArgs = Comma<Expr>;
 Exprs = SemiColon<Expr>;
 Stmts = SemiColon<Statement>;
+Type = Pipe<Name>;
 
 Arg: ArgAst = {
-    <name: Name> => ArgAst::new(<>)
+    <name: Name> ":" <arg_type: Type> => ArgAst::new(<>)
 };
 
 Block: Vec<Box<StmtAst>> = {

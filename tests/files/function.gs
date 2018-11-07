@@ -13,18 +13,18 @@ def expr_test() {
     add(a, b);
 }
 
-def main_args(a, b) {
+def main_args(a: int, b: int) {
     12 * add(a + 4 - add_two(5), b) + 8
 }
 
-def sub(a, b) {
+def sub(a: int, b: int) {
     a - b
 }
 
-def add(a, b) {
+def add(a: int, b: int) {
     a + b
 }
 
-def add_two(a) {
+def add_two(a: int) {
     add(a, 2)
 }

@@ -7,7 +7,7 @@ def test_false() {
     false
 }
 
-def simple_branch(test) {
+def simple_branch(test: bool) {
     if test {
         5
     } else {
@@ -15,7 +15,7 @@ def simple_branch(test) {
     }
 }
 
-def five_or_none(test) {
+def five_or_none(test: bool) {
     if test {
         5
     }

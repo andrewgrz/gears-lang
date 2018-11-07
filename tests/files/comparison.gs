@@ -1,24 +1,24 @@
 
-def compare_eq(a, b) {
+def compare_eq(a: int, b: int) {
     a == b
 }
 
-def compare_not_eq(a, b) {
+def compare_not_eq(a: int, b: int) {
     a != b
 }
 
-def compare_less(a, b) {
+def compare_less(a: int, b: int) {
     a < b
 }
 
-def compare_less_eq(a, b) {
+def compare_less_eq(a: int, b: int) {
     a <= b
 }
 
-def compare_greater(a, b) {
+def compare_greater(a: int, b: int) {
     a > b
 }
 
-def compare_greater_eq(a, b) {
+def compare_greater_eq(a: int, b: int) {
     a >= b
 }
