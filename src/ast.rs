@@ -7,6 +7,7 @@ use std::fmt::Formatter;
 pub type Name = String;
 pub type Args = Vec<ArgAst>;
 pub type FnArgs = Vec<ExprAst>;
+pub type ListArgs = Vec<Box<ExprAst>>;
 pub type Stmts = Vec<Box<StmtAst>>;
 
 #[derive(Debug, Clone)]
@@ -95,6 +96,7 @@ pub enum ExprAst {
     Op(Box<ExprAst>, BinOpAst, Box<ExprAst>),
     Variable(String),
     Bool(bool),
+    List(ListArgs),
     If {
         cmp_expr: Box<ExprAst>,
         exprs: Stmts,
@@ -137,6 +139,10 @@ impl ExprAst {
             range: range,
             exprs: exprs,
         }
+    }
+
+    pub fn new_list(exprs: FnArgs) -> ExprAst {
+        ExprAst::List(exprs.into_iter().map(|x| Box::new(x)).collect::<Vec<Box<ExprAst>>>())
     }
 }
 

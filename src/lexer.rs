@@ -41,6 +41,8 @@ pub enum Token {
     Comma,
     LParen,
     RParen,
+    LBrace,
+    RBrace,
     LBracket,
     RBracket,
     SemiColon,
@@ -109,6 +111,8 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
             ',' => token!(Comma, 1),
             '(' => token!(LParen, 1),
             ')' => token!(RParen, 1),
+            '[' => token!(LBrace, 1),
+            ']' => token!(RBrace, 1),
             '{' => token!(LBracket, 1),
             '}' => token!(RBracket, 1),
             ';' => token!(SemiColon, 1),
@@ -323,6 +327,8 @@ mod tests {
         expect!(",", vec![Comma]);
         expect!("(", vec![LParen]);
         expect!(")", vec![RParen]);
+        expect!("[", vec![LBrace]);
+        expect!("]", vec![RBrace]);
         expect!("{", vec![LBracket]);
         expect!("}", vec![RBracket]);
         expect!(";", vec![SemiColon]);

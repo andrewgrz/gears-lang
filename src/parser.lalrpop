@@ -11,6 +11,8 @@ extern {
     enum lexer::Token {
         "(" => lexer::Token::LParen,
         ")" => lexer::Token::RParen,
+        "[" => lexer::Token::LBrace,
+        "]" => lexer::Token::RBrace,
         "-" => lexer::Token::Minus,
         "+" => lexer::Token::Plus,
         "*" => lexer::Token::Star,
@@ -118,6 +120,10 @@ RangeExpr: RangeAst = {
     <start: Integer> "to" <end: Integer> => RangeAst::new(<>)
 }
 
+ListExpr: ExprAst = {
+    "[" <exprs: FnArgs> "]" => ExprAst::new_list(<>)
+}
+
 CompareOp: BinOpAst = {
     "<" => BinOpAst::LessThan,
     ">" => BinOpAst::GreaterThan,
@@ -157,6 +163,7 @@ Term: ExprAst = {
     Integer => ExprAst::Integer(<>),
     "false" => ExprAst::Bool(false),
     "true" => ExprAst::Bool(true),
+    <ListExpr>,
     <IfExpr>,
     <WhileExpr>,
     <ForExpr>,

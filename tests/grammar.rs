@@ -12,6 +12,7 @@ def example(a, b) {
     let b = a * 9;
     let c = sub(a - b);
     c = 12 * add(a + 4 - add_two(5), b) + c;
+    let d = [1, 2, 3 + 4 * 8 + b];
 
     let d = false;
     let e = true;
