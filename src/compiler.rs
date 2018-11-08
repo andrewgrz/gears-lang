@@ -76,7 +76,7 @@ fn visit_stmt(
 ) -> Result<(), GearsError> {
     match stmt {
         StmtAst::Expr(e) => visit_expr(e, scope, module_builder)?,
-        StmtAst::Assignment { name, expr, new } => {
+        StmtAst::Assignment { name, expr, new, .. } => {
             visit_expr(expr, scope, &mut module_builder)?;
 
             let index = if *new {

@@ -8,34 +8,34 @@ const FULL_GRAMMAR_EXAMPLE: &str = r#"
 def example(a: int, b: int | bool) {
     sub(6 - 2);   # This is a function that is not bound
     # This is a new binding
-    let a = 4 - 3;
-    let b = a * 9;
-    let c = sub(a - b);
+    let a: int = 4 - 3;
+    let b: int = a * 9;
+    let c: int = sub(a - b);
     c = 12 * add(a + 4 - add_two(5), b) + c;
-    let d = [1, 2, 3 + 4 * 8 + b];
+    let d: int = [1, 2, 3 + 4 * 8 + b];
 
-    let d = false;
-    let e = true;
+    let d: bool = false;
+    let e: bool = true;
 }
 
 def branching() {
     if false {
-        let other_variable = 4;
+        let other_variable: int = 4;
     } else {
-        let other_variable = 5;
+        let other_variable: int = 5;
     };
 
-    let x = 3;
+    let x: int = 3;
     while x > 5 {
         x = x + 1;
     };
 
     for x in 0 to 10 {
-        let c = x + 1;
+        let c: int = x + 1;
     }; 
     
     if true {
-        let a = 4 - 3;
+        let a: int = 4 - 3;
     } 
 }
 "#;

@@ -1,4 +1,3 @@
-use lexer;
 use std::fmt::Debug;
 use std::fmt::Error;
 use std::fmt::Formatter;
@@ -26,15 +25,26 @@ pub enum StmtAst {
         new: bool,
         name: String,
         expr: ExprAst,
+        types: Option<Vec<Name>>,
     },
 }
 
 impl StmtAst {
-    pub fn new_assignment(new: Option<lexer::Token>, name: String, expr: ExprAst) -> StmtAst {
+    pub fn new_assignment(name: String, types: Vec<Name>, expr: ExprAst) -> StmtAst {
         StmtAst::Assignment {
-            new: new.is_some(),
+            new: true,
             name: name,
             expr: expr,
+            types: Some(types),
+        }
+    }
+
+    pub fn new_reassignment(name: String, expr: ExprAst) -> StmtAst {
+        StmtAst::Assignment {
+            new: false,
+            name: name,
+            expr: expr,
+            types: None,
         }
     }
 }

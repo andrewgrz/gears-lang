@@ -22,7 +22,7 @@ def five_or_none(test: bool) {
 }
 
 def while_loop() {
-    let a = 1;
+    let a: int = 1;
     while a < 5 {
         a = a + 1;
     };
@@ -30,7 +30,7 @@ def while_loop() {
 }
 
 def for_loop() {
-    let result = 10;
+    let result: int = 10;
 
     for x in 1 to 10 {
         result = result + 1;
