@@ -14,6 +14,7 @@ extern {
         "[" => lexer::Token::LBrace,
         "]" => lexer::Token::RBrace,
         "-" => lexer::Token::Minus,
+        "->" => lexer::Token::Arrow,
         "+" => lexer::Token::Plus,
         "*" => lexer::Token::Star,
         "/" => lexer::Token::Slash,
@@ -85,8 +86,12 @@ ModStmtAst: Box<ModStmtAst> = {
 };
 
 FunctionDef: Box<ModStmtAst> = {
-    "def" <name: Name> "(" <args: Args> ")" <exprs: Block> => Box::new(ModStmtAst::FunctionDef{<>})
+    "def" <name: Name> "(" <args: Args> ")" <return_type: FunctionReturn?> <exprs: Block> => Box::new(ModStmtAst::new_fn(<>))
 };
+
+FunctionReturn: Vec<Name> = {
+    "->" <Type>
+}
 
 Args = Comma<Arg>;
 FnArgs = Comma<Expr>;
