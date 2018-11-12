@@ -3,9 +3,9 @@ use errors::GearsError;
 use lexer;
 use module::{Module, ModuleBuilder};
 use parser;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
-use std::collections::HashMap;
 use symbol::{SymbolTable, SymbolType, Type};
 
 /// Compile a gears file to a module
@@ -30,7 +30,12 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
     // use them during parse as they will resolve
     for ref mod_stmt in &ast {
         match mod_stmt.as_ref() {
-            ModStmtAst::FunctionDef { name, args, return_type, .. } => {
+            ModStmtAst::FunctionDef {
+                name,
+                args,
+                return_type,
+                ..
+            } => {
                 let mut arg_types = HashMap::new();
 
                 for arg in args {
@@ -44,7 +49,9 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
 
     for ref mod_stmt in &ast {
         match mod_stmt.as_ref() {
-            ModStmtAst::FunctionDef { name, exprs, args, .. } => {
+            ModStmtAst::FunctionDef {
+                name, exprs, args, ..
+            } => {
                 module_builder.start_function(name.clone(), args.len());
                 let mut local_scope = (&symbol_table).push();
 
@@ -92,7 +99,12 @@ fn visit_stmt(
 ) -> Result<(), GearsError> {
     match stmt {
         StmtAst::Expr(e) => visit_expr(e, scope, module_builder)?,
-        StmtAst::Assignment { name, expr, new, types } => {
+        StmtAst::Assignment {
+            name,
+            expr,
+            new,
+            types,
+        } => {
             visit_expr(expr, scope, &mut module_builder)?;
 
             let index = if *new {
@@ -121,6 +133,7 @@ fn visit_expr(
     match expr {
         ExprAst::Integer(e) => module_builder.load_int(*e),
         ExprAst::Bool(b) => module_builder.load_bool(b),
+        ExprAst::List(_) => panic!("List is not added yet"),
         ExprAst::If {
             cmp_expr,
             exprs,
@@ -211,7 +224,7 @@ fn visit_expr(
                             ));
                         }
                     }
-                    &SymbolType::Variable { .. }=> {
+                    &SymbolType::Variable { .. } => {
                         // TODO: return location
                         return Err(GearsError::ParseError {
                             location: lexer::Span::new(0, 0),
@@ -227,7 +240,7 @@ fn visit_expr(
 
             match maybe_symbol {
                 Some(symbol) => match symbol.get_type() {
-                    &SymbolType::Function { .. }=> {
+                    &SymbolType::Function { .. } => {
                         return Err(GearsError::InternalCompilerError(
                             "Functions are not first class yet".to_string(),
                         ))

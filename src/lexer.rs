@@ -219,7 +219,7 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
                 if let Some(c) = chars.next() {
                     let (tmp, _) = take_while_lookback(c, &mut chars, |c, l| c != '"' && l != '\\');
                     token_data!(Token::Str(tmp), tmp.len());
-                    // Not continueing will eat the ending "
+                // Not continueing will eat the ending "
                 } else {
                     tokens.push(Err(LexicalError::UnknownToken(c)))
                 }
@@ -227,9 +227,10 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
 
             '\'' => {
                 if let Some(c) = chars.next() {
-                    let (tmp, _) = take_while_lookback(c, &mut chars, |c, l| c != '\'' && l != '\\');
+                    let (tmp, _) =
+                        take_while_lookback(c, &mut chars, |c, l| c != '\'' && l != '\\');
                     token_data!(Token::Str(tmp), tmp.len());
-                    // Not continueing will eat the ending "
+                // Not continueing will eat the ending "
                 } else {
                     tokens.push(Err(LexicalError::UnknownToken(c)))
                 }

@@ -112,7 +112,7 @@ impl GearsObject {
             Str(l) => match other {
                 Str(r) => l == r,
                 _ => false,
-            }
+            },
             None => false,
         }
     }

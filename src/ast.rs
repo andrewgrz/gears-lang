@@ -20,13 +20,23 @@ pub enum ModStmtAst {
 }
 
 impl ModStmtAst {
-    pub fn new_fn(name: String, args: Args, return_type: Option<Vec<Name>>, exprs: Stmts) -> ModStmtAst {
+    pub fn new_fn(
+        name: String,
+        args: Args,
+        return_type: Option<Vec<Name>>,
+        exprs: Stmts,
+    ) -> ModStmtAst {
         let conv_return_type = match return_type {
             Some(e) => e,
-            None => vec!["None".to_string()]
+            None => vec!["None".to_string()],
         };
 
-        ModStmtAst::FunctionDef { name, args, exprs, return_type: conv_return_type }
+        ModStmtAst::FunctionDef {
+            name,
+            args,
+            exprs,
+            return_type: conv_return_type,
+        }
     }
 }
 
@@ -69,7 +79,10 @@ pub struct ArgAst {
 
 impl ArgAst {
     pub fn new(name: Name, arg_type: Vec<Name>) -> ArgAst {
-        ArgAst { name: name, arg_types: arg_type }
+        ArgAst {
+            name: name,
+            arg_types: arg_type,
+        }
     }
 
     pub fn name(&self) -> &Name {
@@ -169,7 +182,12 @@ impl ExprAst {
     }
 
     pub fn new_list(exprs: FnArgs) -> ExprAst {
-        ExprAst::List(exprs.into_iter().map(|x| Box::new(x)).collect::<Vec<Box<ExprAst>>>())
+        ExprAst::List(
+            exprs
+                .into_iter()
+                .map(|x| Box::new(x))
+                .collect::<Vec<Box<ExprAst>>>(),
+        )
     }
 }
 
