@@ -1,5 +1,5 @@
 
-def main_no_args() {
+def main_no_args() -> int {
     sub(6, 2);
     let a: int = 4 - 3;
     let b: int = a * 9;
@@ -13,18 +13,18 @@ def expr_test() {
     add(a, b);
 }
 
-def main_args(a: int, b: int) {
+def main_args(a: int, b: int) -> int {
     12 * add(a + 4 - add_two(5), b) + 8
 }
 
-def sub(a: int, b: int) {
+def sub(a: int, b: int) -> int {
     a - b
 }
 
-def add(a: int, b: int) {
+def add(a: int, b: int) -> int {
     a + b
 }
 
-def add_two(a: int) {
+def add_two(a: int) -> int {
     add(a, 2)
 }

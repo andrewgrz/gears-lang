@@ -1,13 +1,13 @@
 
-def test_true() {
+def test_true() -> bool {
     true
 }
 
-def test_false() {
+def test_false() -> bool {
     false
 }
 
-def simple_branch(test: bool) {
+def simple_branch(test: bool) -> int {
     if test {
         5
     } else {
@@ -15,13 +15,13 @@ def simple_branch(test: bool) {
     }
 }
 
-def five_or_none(test: bool) {
+def five_or_none(test: bool) -> int | None {
     if test {
         5
     }
 }
 
-def while_loop() {
+def while_loop() -> int {
     let a: int = 1;
     while a < 5 {
         a = a + 1;
@@ -29,7 +29,7 @@ def while_loop() {
     a
 }
 
-def for_loop() {
+def for_loop() -> int {
     let result: int = 10;
 
     for x in 1 to 10 {
