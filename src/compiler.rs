@@ -5,7 +5,8 @@ use module::{Module, ModuleBuilder};
 use parser;
 use std::fs::File;
 use std::io::prelude::*;
-use symbol::{SymbolTable, SymbolType};
+use std::collections::HashMap;
+use symbol::{SymbolTable, SymbolType, Type};
 
 /// Compile a gears file to a module
 pub fn compile_file(filename: &str) -> Result<Module, GearsError> {
@@ -29,20 +30,26 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
     // use them during parse as they will resolve
     for ref mod_stmt in &ast {
         match mod_stmt.as_ref() {
-            ModStmtAst::FunctionDef { name, .. } => {
-                symbol_table.def_fn(name.clone());
+            ModStmtAst::FunctionDef { name, args, return_type, .. } => {
+                let mut arg_types = HashMap::new();
+
+                for arg in args {
+                    arg_types.insert(arg.name().clone(), compile_types(arg.arg_types()));
+                }
+
+                symbol_table.def_fn(name.clone(), arg_types, compile_types(return_type));
             }
         }
     }
 
     for ref mod_stmt in &ast {
         match mod_stmt.as_ref() {
-            ModStmtAst::FunctionDef { name, exprs, args } => {
+            ModStmtAst::FunctionDef { name, exprs, args, .. } => {
                 module_builder.start_function(name.clone(), args.len());
                 let mut local_scope = (&symbol_table).push();
 
                 for arg in args {
-                    local_scope.def_variable(arg.name().clone());
+                    local_scope.def_variable(arg.name().clone(), compile_types(arg.arg_types()));
                 }
 
                 for stmt in exprs {
@@ -55,6 +62,15 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
     }
 
     Ok(module_builder.build())
+}
+
+fn compile_types(types: &Vec<String>) -> Vec<Type> {
+    let mut types_vec = Vec::new();
+
+    for t in types {
+        types_vec.push(Type::from(t.clone()))
+    }
+    types_vec
 }
 
 fn visit_block(
@@ -76,11 +92,11 @@ fn visit_stmt(
 ) -> Result<(), GearsError> {
     match stmt {
         StmtAst::Expr(e) => visit_expr(e, scope, module_builder)?,
-        StmtAst::Assignment { name, expr, new, .. } => {
+        StmtAst::Assignment { name, expr, new, types } => {
             visit_expr(expr, scope, &mut module_builder)?;
 
             let index = if *new {
-                scope.def_variable(name.clone())
+                scope.def_variable(name.clone(), compile_types(&types.clone().unwrap()))
             } else {
                 let (symbol, _is_global) = scope.resolve(name);
 
@@ -140,7 +156,7 @@ fn visit_expr(
         ExprAst::For { name, range, exprs } => {
             // Push a loop level scope and define the name into that scope
             let mut local_scope = (&scope).push();
-            let name_index = local_scope.def_variable(name.clone());
+            let name_index = local_scope.def_variable(name.clone(), vec![Type::from("int")]);
             module_builder.load_int(range.start());
             module_builder.store_fast(name_index);
             let loop_index = module_builder.start_loop_check();
@@ -186,7 +202,7 @@ fn visit_expr(
 
             match maybe_symbol {
                 Some(symbol) => match symbol.get_type() {
-                    &SymbolType::Function => {
+                    &SymbolType::Function { .. } => {
                         if is_global {
                             module_builder.call_fn(*symbol.get_index(), args.len() as u8);
                         } else {
@@ -195,7 +211,7 @@ fn visit_expr(
                             ));
                         }
                     }
-                    &SymbolType::Variable => {
+                    &SymbolType::Variable { .. }=> {
                         // TODO: return location
                         return Err(GearsError::ParseError {
                             location: lexer::Span::new(0, 0),
@@ -211,12 +227,12 @@ fn visit_expr(
 
             match maybe_symbol {
                 Some(symbol) => match symbol.get_type() {
-                    &SymbolType::Function => {
+                    &SymbolType::Function { .. }=> {
                         return Err(GearsError::InternalCompilerError(
                             "Functions are not first class yet".to_string(),
                         ))
                     }
-                    &SymbolType::Variable => {
+                    &SymbolType::Variable { .. } => {
                         if !is_global {
                             module_builder.load_fast(*symbol.get_index());
                         }

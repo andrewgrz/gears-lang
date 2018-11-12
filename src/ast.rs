@@ -15,7 +15,19 @@ pub enum ModStmtAst {
         name: String,
         args: Args,
         exprs: Stmts,
+        return_type: Vec<Name>,
     },
+}
+
+impl ModStmtAst {
+    pub fn new_fn(name: String, args: Args, return_type: Option<Vec<Name>>, exprs: Stmts) -> ModStmtAst {
+        let conv_return_type = match return_type {
+            Some(e) => e,
+            None => vec!["None".to_string()]
+        };
+
+        ModStmtAst::FunctionDef { name, args, exprs, return_type: conv_return_type }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -62,6 +74,10 @@ impl ArgAst {
 
     pub fn name(&self) -> &Name {
         &self.name
+    }
+
+    pub fn arg_types(&self) -> &Vec<Name> {
+        &self.arg_types
     }
 }
 
