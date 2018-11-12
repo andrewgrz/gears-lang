@@ -46,6 +46,7 @@ pub enum Token {
     LBracket,
     RBracket,
     Pipe,
+    Arrow,
     SemiColon,
     Colon,
     Eq,
@@ -173,7 +174,20 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
                 }
             }
             '+' => token!(Plus, 1),
-            '-' => token!(Minus, 1),
+            '-' => {
+                lookahead = chars.next();
+                if let Some(c) = lookahead {
+                    match c {
+                        '>' => token!(Arrow, 2),
+                        _ => {
+                            token!(Minus, 1);
+                            continue;
+                        }
+                    }
+                } else {
+                    token!(Minus, 1)
+                }
+            }
             '*' => token!(Star, 1),
             '/' => token!(Slash, 1),
 
@@ -345,6 +359,7 @@ mod tests {
         expect!(">=", vec![GreaterThanEq]);
         expect!("+", vec![Plus]);
         expect!("-", vec![Minus]);
+        expect!("->", vec![Arrow]);
         expect!("*", vec![Star]);
         expect!("/", vec![Slash]);
         expect!("\"test\"", vec![Str("test".to_owned())]);
