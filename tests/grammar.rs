@@ -5,7 +5,7 @@ use lalrpop_util::ParseError;
 
 const FULL_GRAMMAR_EXAMPLE: &str = r#"
 # Top Level Comment
-def example(a: int, b: int | bool) {
+def example(a: int, b: int | bool) -> int | None {
     sub(6 - 2);   # This is a function that is not bound
     # This is a new binding
     let a: int = 4 - 3;
