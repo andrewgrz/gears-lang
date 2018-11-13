@@ -15,7 +15,7 @@ def simple_branch(test: bool) -> int {
     }
 }
 
-def five_or_none(test: bool) -> int | None {
+def five_or_none(test: bool) -> int | none {
     if test {
         5
     }

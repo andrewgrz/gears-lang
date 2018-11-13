@@ -28,7 +28,7 @@ impl ModStmtAst {
     ) -> ModStmtAst {
         let conv_return_type = match return_type {
             Some(e) => e,
-            None => vec!["None".to_string()],
+            None => vec!["none".to_string()],
         };
 
         ModStmtAst::FunctionDef {

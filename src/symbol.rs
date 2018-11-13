@@ -1,9 +1,23 @@
 
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Type {
     name: String,
+}
+
+impl Type {
+    pub fn new_none() -> Type {
+        Type { name: "none".to_owned() }
+    }
+
+    pub fn new_int() -> Type {
+        Type { name: "int".to_owned() }
+    }
+
+    pub fn new_bool() -> Type {
+        Type { name: "bool".to_owned() }
+    }
 }
 
 impl From<String> for Type {

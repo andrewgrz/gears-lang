@@ -3,10 +3,11 @@ use errors::GearsError;
 use lexer;
 use module::{Module, ModuleBuilder};
 use parser;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::prelude::*;
-use symbol::{SymbolTable, SymbolType, Type};
+use symbol::{SymbolTable, SymbolType, Type, Types};
+use std::iter::FromIterator;
 
 /// Compile a gears file to a module
 pub fn compile_file(filename: &str) -> Result<Module, GearsError> {
@@ -84,29 +85,44 @@ fn visit_block(
     exprs: &Vec<Box<StmtAst>>,
     scope: &mut SymbolTable,
     mut module_builder: &mut ModuleBuilder,
-) -> Result<(), GearsError> {
+) -> Result<Types, GearsError> {
     let mut local_scope = (&scope).push();
+    let mut last_type = vec![Type::new_none()];
+
     for stmt in exprs {
-        visit_stmt(stmt, &mut local_scope, &mut module_builder)?;
+        last_type = visit_stmt(stmt, &mut local_scope, &mut module_builder)?;
     }
-    Ok(())
+    Ok(last_type)
 }
 
 fn visit_stmt(
     stmt: &StmtAst,
     scope: &mut SymbolTable,
     mut module_builder: &mut ModuleBuilder,
-) -> Result<(), GearsError> {
+) -> Result<Types, GearsError> {
     match stmt {
-        StmtAst::Expr(e) => visit_expr(e, scope, module_builder)?,
+        StmtAst::Expr(e) => visit_expr(e, scope, module_builder),
         StmtAst::Assignment {
             name,
             expr,
             new,
             types,
         } => {
-            visit_expr(expr, scope, &mut module_builder)?;
+            let expr_types = visit_expr(expr, scope, &mut module_builder)?;
 
+            let var_types: Types = match types {
+                Some(given_types) => {
+                    let given_types = compile_types(&given_types);
+                    for expr_type in &expr_types {
+                        if !given_types.contains(&expr_type) {
+                            return Err(GearsError::TypeError(format!("{:?} is not compatible with {:?}", given_types, expr_types)))
+                        }
+                    }
+                    given_types
+                },
+                None => expr_types
+            };
+            
             let index = if *new {
                 scope.def_variable(name.clone(), compile_types(&types.clone().unwrap()))
             } else {
@@ -119,20 +135,25 @@ fn visit_stmt(
             };
 
             module_builder.store_fast(index);
+            Ok(var_types)
         }
     }
-
-    Ok(())
 }
 
 fn visit_expr(
     expr: &ExprAst,
     scope: &mut SymbolTable,
     mut module_builder: &mut ModuleBuilder,
-) -> Result<(), GearsError> {
-    match expr {
-        ExprAst::Integer(e) => module_builder.load_int(*e),
-        ExprAst::Bool(b) => module_builder.load_bool(b),
+) -> Result<Types, GearsError> {
+    let res: Types = match expr {
+        ExprAst::Integer(e) => {
+            module_builder.load_int(*e);
+            vec![Type::new_int()]
+        }
+        ExprAst::Bool(b) => {
+            module_builder.load_bool(b);
+            vec![Type::new_bool()]
+        }
         ExprAst::List(_) => panic!("List is not added yet"),
         ExprAst::If {
             cmp_expr,
@@ -141,30 +162,43 @@ fn visit_expr(
         } => {
             visit_expr(cmp_expr, scope, &mut module_builder)?;
             let jump_index = module_builder.start_jump_if_false();
-            visit_block(exprs, scope, &mut module_builder)?;
+            let if_block_types = HashSet::from_iter(visit_block(exprs, scope, &mut module_builder)?);
 
-            match else_exprs {
+            let else_block_types: HashSet<Type> = match else_exprs {
                 Some(exprs) => {
                     let jump_index = module_builder.start_else(jump_index);
                     let mut local_scope = (&scope).push();
+                    let mut last_type = vec![Type::new_none()];
                     for stmt in exprs {
-                        visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
+                        last_type = visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
                     }
                     module_builder.end_jump(jump_index);
+                    HashSet::from_iter(last_type)
                 }
                 None => {
                     let jump_index = module_builder.start_else(jump_index);
                     module_builder.load_none();
                     module_builder.end_jump(jump_index);
+                    let mut res = HashSet::new();
+                    res.insert(Type::new_none());
+                    res
                 }
+            };
+
+            let mut res = Vec::new();
+            for res_type in if_block_types.union(&else_block_types) {
+                res.push(res_type.clone());
             }
+
+            res
         }
         ExprAst::While { cmp_expr, exprs } => {
             let loop_index = module_builder.start_loop_check();
             visit_expr(cmp_expr, scope, &mut module_builder)?;
             let jump_index = module_builder.start_jump_if_false();
-            visit_block(exprs, scope, &mut module_builder)?;
+            let result = visit_block(exprs, scope, &mut module_builder)?;
             module_builder.end_loop(loop_index, jump_index);
+            result
         }
         ExprAst::For { name, range, exprs } => {
             // Push a loop level scope and define the name into that scope
@@ -183,13 +217,16 @@ fn visit_expr(
             visit_expr(cmp_expr, &mut local_scope, &mut module_builder)?;
 
             let jump_index = module_builder.start_jump_if_false();
-            visit_block(exprs, &mut local_scope, &mut module_builder)?;
+            let result = visit_block(exprs, &mut local_scope, &mut module_builder)?;
             module_builder.load_fast(name_index);
             module_builder.inc_one();
             module_builder.store_fast(name_index);
             module_builder.end_loop(loop_index, jump_index);
+            result
         }
         ExprAst::Op(left, op, right) => {
+            use self::BinOpAst::*;
+
             visit_expr(left, scope, &mut module_builder)?;
             visit_expr(right, scope, &mut module_builder)?;
 
@@ -205,6 +242,11 @@ fn visit_expr(
                 BinOpAst::GreaterThan => module_builder.op_greater(),
                 BinOpAst::GreaterThanEq => module_builder.op_greater_eq(),
             }
+
+            match op {
+                Add | Sub | Mul | Div => vec![Type::new_int()],
+                _ => vec![Type::new_bool()],
+            }
         }
         ExprAst::FunctionCall { ref name, ref args } => {
             for arg in args {
@@ -215,9 +257,10 @@ fn visit_expr(
 
             match maybe_symbol {
                 Some(symbol) => match symbol.get_type() {
-                    &SymbolType::Function { .. } => {
+                    &SymbolType::Function { ref return_types, .. } => {
                         if is_global {
                             module_builder.call_fn(*symbol.get_index(), args.len() as u8);
+                            return_types.clone()
                         } else {
                             return Err(GearsError::InternalCompilerError(
                                 "Closures are not supported yet".to_string(),
@@ -236,7 +279,7 @@ fn visit_expr(
             }
         }
         ExprAst::Variable(name) => {
-            let (maybe_symbol, is_global) = scope.resolve(name);
+            let (maybe_symbol, _) = scope.resolve(name);
 
             match maybe_symbol {
                 Some(symbol) => match symbol.get_type() {
@@ -245,16 +288,15 @@ fn visit_expr(
                             "Functions are not first class yet".to_string(),
                         ))
                     }
-                    &SymbolType::Variable { .. } => {
-                        if !is_global {
-                            module_builder.load_fast(*symbol.get_index());
-                        }
+                    &SymbolType::Variable { ref types } => {
+                        module_builder.load_fast(*symbol.get_index());
+                        types.clone()
                     }
                 },
                 None => return Err(GearsError::SymbolNotFound(name.clone())),
             }
         }
-    }
+    };
 
-    Ok(())
+    Ok(res)
 }
