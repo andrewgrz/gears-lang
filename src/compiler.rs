@@ -6,8 +6,8 @@ use parser;
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::prelude::*;
-use symbol::{SymbolTable, SymbolType, Type, Types};
 use std::iter::FromIterator;
+use symbol::{SymbolTable, SymbolType, Type, Types};
 
 /// Compile a gears file to a module
 pub fn compile_file(filename: &str) -> Result<Module, GearsError> {
@@ -115,14 +115,17 @@ fn visit_stmt(
                     let given_types = compile_types(&given_types);
                     for expr_type in &expr_types {
                         if !given_types.contains(&expr_type) {
-                            return Err(GearsError::TypeError(format!("{:?} is not compatible with {:?}", given_types, expr_types)))
+                            return Err(GearsError::TypeError(format!(
+                                "{:?} is not compatible with {:?}",
+                                given_types, expr_types
+                            )));
                         }
                     }
                     given_types
-                },
-                None => expr_types
+                }
+                None => expr_types,
             };
-            
+
             let index = if *new {
                 scope.def_variable(name.clone(), compile_types(&types.clone().unwrap()))
             } else {
@@ -162,7 +165,8 @@ fn visit_expr(
         } => {
             visit_expr(cmp_expr, scope, &mut module_builder)?;
             let jump_index = module_builder.start_jump_if_false();
-            let if_block_types = HashSet::from_iter(visit_block(exprs, scope, &mut module_builder)?);
+            let if_block_types =
+                HashSet::from_iter(visit_block(exprs, scope, &mut module_builder)?);
 
             let else_block_types: HashSet<Type> = match else_exprs {
                 Some(exprs) => {
@@ -170,7 +174,8 @@ fn visit_expr(
                     let mut local_scope = (&scope).push();
                     let mut last_type = vec![Type::new_none()];
                     for stmt in exprs {
-                        last_type = visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
+                        last_type =
+                            visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
                     }
                     module_builder.end_jump(jump_index);
                     HashSet::from_iter(last_type)
@@ -227,8 +232,8 @@ fn visit_expr(
         ExprAst::Op(left, op, right) => {
             use self::BinOpAst::*;
 
-            visit_expr(left, scope, &mut module_builder)?;
-            visit_expr(right, scope, &mut module_builder)?;
+            let left_types = visit_expr(left, scope, &mut module_builder)?;
+            let right_types = visit_expr(right, scope, &mut module_builder)?;
 
             match op {
                 BinOpAst::Add => module_builder.op_add(),
@@ -244,7 +249,22 @@ fn visit_expr(
             }
 
             match op {
-                Add | Sub | Mul | Div => vec![Type::new_int()],
+                Add | Sub | Mul | Div => {
+                    if left_types.len() != 1 || left_types[0] != Type::new_int() {
+                        return Err(GearsError::TypeError(format!(
+                            "Only ints are supported for math at this time. Left hand is: {:?}",
+                            left_types
+                        )));
+                    }
+                    if right_types.len() != 1 || right_types[0] != Type::new_int() {
+                        return Err(GearsError::TypeError(format!(
+                            "Only ints are supported for math at this time. Right hand is: {:?}",
+                            right_types
+                        )));
+                    }
+
+                    vec![Type::new_int()]
+                }
                 _ => vec![Type::new_bool()],
             }
         }
@@ -257,7 +277,9 @@ fn visit_expr(
 
             match maybe_symbol {
                 Some(symbol) => match symbol.get_type() {
-                    &SymbolType::Function { ref return_types, .. } => {
+                    &SymbolType::Function {
+                        ref return_types, ..
+                    } => {
                         if is_global {
                             module_builder.call_fn(*symbol.get_index(), args.len() as u8);
                             return_types.clone()
