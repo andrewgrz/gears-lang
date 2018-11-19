@@ -16,6 +16,7 @@ def example(a: int, b: int | bool) -> int | None {
 
     let d: bool = false;
     let e: bool = true;
+    let string: str = "Test";
 }
 
 def branching() {
