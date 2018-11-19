@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -8,15 +7,21 @@ pub struct Type {
 
 impl Type {
     pub fn new_none() -> Type {
-        Type { name: "none".to_owned() }
+        Type {
+            name: "none".to_owned(),
+        }
     }
 
     pub fn new_int() -> Type {
-        Type { name: "int".to_owned() }
+        Type {
+            name: "int".to_owned(),
+        }
     }
 
     pub fn new_bool() -> Type {
-        Type { name: "bool".to_owned() }
+        Type {
+            name: "bool".to_owned(),
+        }
     }
 
     pub fn new_str() -> Type {
@@ -32,9 +37,11 @@ impl From<String> for Type {
     }
 }
 
-impl <'a> From<&'a str> for Type {
+impl<'a> From<&'a str> for Type {
     fn from(name: &str) -> Type {
-        Type { name: name.to_string() }
+        Type {
+            name: name.to_string(),
+        }
     }
 }
 
@@ -42,8 +49,13 @@ pub type Types = Vec<Type>;
 
 #[derive(Debug, Clone)]
 pub enum SymbolType {
-    Function { arg_types: HashMap<String, Types>, return_types: Types },
-    Variable { types: Types },
+    Function {
+        arg_types: HashMap<String, Types>,
+        return_types: Types,
+    },
+    Variable {
+        types: Types,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -55,15 +67,18 @@ pub struct Symbol {
 impl Symbol {
     fn new_fn(index: u8, arg_types: HashMap<String, Types>, return_types: Types) -> Symbol {
         Symbol {
-            sym_type: SymbolType::Function { arg_types, return_types },
-            index: index
+            sym_type: SymbolType::Function {
+                arg_types,
+                return_types,
+            },
+            index: index,
         }
     }
 
     fn new_var(index: u8, types: Types) -> Symbol {
         Symbol {
             sym_type: SymbolType::Variable { types },
-            index: index
+            index: index,
         }
     }
 
@@ -81,14 +96,14 @@ pub struct SymbolTable<'a> {
     symbols: HashMap<String, Symbol>,
 }
 
-impl <'a> SymbolTable<'a> {
+impl<'a> SymbolTable<'a> {
     pub fn new_global() -> SymbolTable<'a> {
         SymbolTable {
             parent: None,
             symbols: HashMap::new(),
         }
     }
- 
+
     pub fn push(&'a self) -> SymbolTable<'a> {
         SymbolTable {
             symbols: HashMap::new(),
@@ -108,9 +123,15 @@ impl <'a> SymbolTable<'a> {
         }
     }
 
-    pub fn def_fn(&mut self, name: String, arg_types: HashMap<String, Types>, return_types: Types) -> u8 {
+    pub fn def_fn(
+        &mut self,
+        name: String,
+        arg_types: HashMap<String, Types>,
+        return_types: Types,
+    ) -> u8 {
         let index = self.get_next_index();
-        self.symbols.insert(name, Symbol::new_fn(index, arg_types, return_types));
+        self.symbols
+            .insert(name, Symbol::new_fn(index, arg_types, return_types));
         index
     }
 
@@ -121,17 +142,15 @@ impl <'a> SymbolTable<'a> {
     }
 
     /// Resolves a variable
-    /// 
+    ///
     /// The second value is true if we resolved in the global scope
     pub fn resolve(&self, name: &String) -> (Option<&Symbol>, bool) {
         match self.symbols.get(name) {
             Some(e) => (Some(e), self.parent.is_none()),
-            None => {
-                match self.parent {
-                    Some(p) => p.resolve(name),
-                    None => (None, self.parent.is_none())
-                }
-            }
+            None => match self.parent {
+                Some(p) => p.resolve(name),
+                None => (None, self.parent.is_none()),
+            },
         }
     }
 }

@@ -1,7 +1,6 @@
-
-use module::{Module, Function};
-use object::{GearsResult, GearsObject};
 use errors::{GearsError, InterOpErrorType};
+use module::{Function, Module};
+use object::{GearsObject, GearsResult};
 use opcodes::*;
 
 /// Execute a function contained in a compiled module
@@ -12,10 +11,22 @@ pub fn execute_function(module: &Module, function: &str, args: Vec<GearsObject>)
 
     if num_given_args != num_fn_args {
         if num_given_args < num_fn_args {
-            return Err(GearsError::InterOpError{ error: InterOpErrorType::TooFewArgs, message: format!("Function missing args: {}, expected: {}, received: {}", function, num_fn_args, num_given_args)});
+            return Err(GearsError::InterOpError {
+                error: InterOpErrorType::TooFewArgs,
+                message: format!(
+                    "Function missing args: {}, expected: {}, received: {}",
+                    function, num_fn_args, num_given_args
+                ),
+            });
         } else {
-            return Err(GearsError::InterOpError{ error: InterOpErrorType::TooManyArgs, message: format!("Function pass extra args: {}, expected: {}, received: {}", function, num_fn_args, num_given_args)});
-        }   
+            return Err(GearsError::InterOpError {
+                error: InterOpErrorType::TooManyArgs,
+                message: format!(
+                    "Function pass extra args: {}, expected: {}, received: {}",
+                    function, num_fn_args, num_given_args
+                ),
+            });
+        }
     }
 
     execute(&mod_fn, &module, args)
@@ -31,9 +42,13 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
         () => {
             match stack.pop() {
                 Some(e) => e,
-                None => return Err(GearsError::InternalCompilerError("Unexpected Empty Stack".to_string())),
+                None => {
+                    return Err(GearsError::InternalCompilerError(
+                        "Unexpected Empty Stack".to_string(),
+                    ))
+                }
             }
-        }
+        };
     }
 
     macro_rules! push {
@@ -89,7 +104,11 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
 
                 match args.get(cur_instr as usize) {
                     Some(e) => push!(e.clone()),
-                    None => return Err(GearsError::InternalCompilerError(format!("LOAD_FAST failed")))
+                    None => {
+                        return Err(GearsError::InternalCompilerError(format!(
+                            "LOAD_FAST failed"
+                        )))
+                    }
                 }
             }
             STORE_FAST => {
@@ -105,7 +124,7 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
             LOAD_CONST => {
                 advance!();
                 push!((*module.get_const(cur_instr as usize)).clone());
-            },
+            }
             CALL_FUNCTION => {
                 advance!();
                 let fn_index = cur_instr;
@@ -118,35 +137,44 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
                 }
                 next_args.reverse();
 
-                push!(execute(module.get_function_by_index(fn_index as usize)?, module, next_args)?);
-            },
+                push!(execute(
+                    module.get_function_by_index(fn_index as usize)?,
+                    module,
+                    next_args
+                )?);
+            }
             LOAD_TRUE => {
                 push!(GearsObject::Bool(true));
-            },
+            }
             LOAD_FALSE => {
                 push!(GearsObject::Bool(false));
-            },
+            }
             LOAD_NONE => {
                 push!(GearsObject::None);
-            },
+            }
             JUMP => {
                 advance!();
                 ip += cur_instr as usize;
-            },
+            }
             JUMP_ABSOLUTE => {
                 cur_instr = opcodes[ip];
                 ip = cur_instr as usize;
-            },
+            }
             JUMP_IF_FALSE => {
                 advance!();
                 if !pop!().as_bool() {
-                    ip += cur_instr as usize; 
+                    ip += cur_instr as usize;
                 }
-            },
+            }
             INC_ONE => {
                 unary_op!(inc);
             }
-            _ => return Err(GearsError::InternalCompilerError(format!("Unexpected Opcode: {:?}", cur_instr))),
+            _ => {
+                return Err(GearsError::InternalCompilerError(format!(
+                    "Unexpected Opcode: {:?}",
+                    cur_instr
+                )))
+            }
         }
     }
 }
@@ -154,7 +182,7 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use module::{ModuleBuilder};
+    use module::ModuleBuilder;
 
     #[test]
     fn test_addition() {
@@ -169,7 +197,7 @@ mod tests {
         module_builder.finish_function();
 
         let module = module_builder.build();
-        let result = execute_function(&module, "simple_math", Vec::new(),);
+        let result = execute_function(&module, "simple_math", Vec::new());
         assert_eq!(result, Ok(GearsObject::Int(15)));
     }
 
@@ -186,7 +214,7 @@ mod tests {
         module_builder.finish_function();
 
         let module = module_builder.build();
-        let result = execute_function(&module, "simple_math", Vec::new(),);
+        let result = execute_function(&module, "simple_math", Vec::new());
         assert_eq!(result, Ok(GearsObject::Int(11)));
     }
 
@@ -203,7 +231,7 @@ mod tests {
         module_builder.finish_function();
 
         let module = module_builder.build();
-        let result = execute_function(&module, "simple_math", Vec::new(),);
+        let result = execute_function(&module, "simple_math", Vec::new());
         assert_eq!(result, Ok(GearsObject::Int(60)));
     }
 
@@ -220,7 +248,7 @@ mod tests {
         module_builder.finish_function();
 
         let module = module_builder.build();
-        let result = execute_function(&module, "simple_math", Vec::new(),);
+        let result = execute_function(&module, "simple_math", Vec::new());
         assert_eq!(result, Ok(GearsObject::Int(2)));
-    } 
+    }
 }
