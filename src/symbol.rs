@@ -18,6 +18,12 @@ impl Type {
     pub fn new_bool() -> Type {
         Type { name: "bool".to_owned() }
     }
+
+    pub fn new_str() -> Type {
+        Type {
+            name: "str".to_owned(),
+        }
+    }
 }
 
 impl From<String> for Type {

@@ -45,9 +45,7 @@ impl Module {
         &self.consts[index]
     }
 
-    fn insert_int(&mut self, number: i64) -> usize {
-        let new_value = GearsObject::Int(number);
-
+    fn insert_const(&mut self, new_value: GearsObject) -> usize {
         for (index, constant) in self.consts.iter().enumerate() {
             if constant == &new_value {
                 return index;
@@ -56,7 +54,19 @@ impl Module {
 
         let result = self.consts.len();
         self.consts.push(new_value);
-        return result;
+        result
+    }
+
+    fn insert_int(&mut self, number: i64) -> usize {
+        let new_value = GearsObject::Int(number);
+
+        self.insert_const(new_value)
+    }
+
+    fn insert_string(&mut self, string: String) -> usize {
+        let new_value = GearsObject::Str(string);
+
+        self.insert_const(new_value)
     }
 }
 
@@ -127,6 +137,13 @@ impl ModuleBuilder {
         let index = self.module.insert_int(number);
 
         // TODO: Handle int overflow with new opcode
+
+        self.opcode(LOAD_CONST);
+        self.opcode(index as u8);
+    }
+
+    pub fn load_str(&mut self, string: String) {
+        let index = self.module.insert_string(string);
 
         self.opcode(LOAD_CONST);
         self.opcode(index as u8);

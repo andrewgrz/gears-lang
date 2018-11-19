@@ -197,3 +197,9 @@ impl From<bool> for GearsObject {
         GearsObject::Bool(b)
     }
 }
+
+impl<'a> From<&'a str> for GearsObject {
+    fn from(s: &str) -> GearsObject {
+        GearsObject::Str(s.to_string())
+    }
+}

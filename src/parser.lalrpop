@@ -33,6 +33,7 @@ extern {
         ">=" => lexer::Token::GreaterThanEq,
         Integer => lexer::Token::Integer(<i64>),
         Name => lexer::Token::Name(<String>),
+        Str => lexer::Token::Str(<String>),
         "def" => lexer::Token::Def,
         "if" => lexer::Token::If,
         "while" => lexer::Token::While,
@@ -179,6 +180,7 @@ FactorOp: BinOpAst = {
 Term: ExprAst = {
     Name => ExprAst::Variable(<>.to_string()),
     Integer => ExprAst::Integer(<>),
+    Str => ExprAst::Str(<>),
     "false" => ExprAst::Bool(false),
     "true" => ExprAst::Bool(true),
     <ListExpr>,

@@ -136,6 +136,7 @@ pub enum ExprAst {
     Op(Box<ExprAst>, BinOpAst, Box<ExprAst>),
     Variable(String),
     Bool(bool),
+    Str(String),
     List(ListArgs),
     If {
         cmp_expr: Box<ExprAst>,

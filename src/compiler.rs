@@ -153,6 +153,10 @@ fn visit_expr(
             module_builder.load_int(*e);
             vec![Type::new_int()]
         }
+        ExprAst::Str(e) => {
+            module_builder.load_str((*e).to_string());
+            vec![Type::new_str()]
+        }
         ExprAst::Bool(b) => {
             module_builder.load_bool(b);
             vec![Type::new_bool()]
