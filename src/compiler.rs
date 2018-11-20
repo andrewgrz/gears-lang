@@ -51,7 +51,11 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
     for ref mod_stmt in &ast {
         match mod_stmt.as_ref() {
             ModStmtAst::FunctionDef {
-                name, exprs, args, ..
+                name,
+                exprs,
+                args,
+                return_type,
+                ..
             } => {
                 module_builder.start_function(name.clone(), args.len());
                 let mut local_scope = (&symbol_table).push();
@@ -60,8 +64,22 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
                     local_scope.def_variable(arg.name().clone(), compile_types(arg.arg_types()));
                 }
 
+                let mut last_expr_types = vec![Type::new_none()];
+
                 for stmt in exprs {
-                    visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
+                    last_expr_types =
+                        visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
+                }
+
+                let return_types = compile_types(return_type);
+
+                for expr_type in &last_expr_types {
+                    if !return_types.contains(expr_type) {
+                        return Err(GearsError::TypeError(format!(
+                            "{:?} is not compatible with {:?}",
+                            return_types, last_expr_types
+                        )));
+                    }
                 }
 
                 module_builder.finish_function();
