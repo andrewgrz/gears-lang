@@ -64,20 +64,14 @@ fn compile_ast(ast: Vec<Box<ModStmtAst>>, name: &str) -> Result<Module, GearsErr
                     local_scope.def_variable(arg.name().clone(), compile_types(arg.arg_types()));
                 }
 
-                let mut last_expr_types = vec![Type::new_none()];
-
-                for stmt in exprs {
-                    last_expr_types =
-                        visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
-                }
-
+                let block_type = visit_block(exprs, &mut local_scope, &mut module_builder)?;
                 let return_types = compile_types(return_type);
 
-                for expr_type in &last_expr_types {
+                for expr_type in &block_type {
                     if !return_types.contains(expr_type) {
                         return Err(GearsError::TypeError(format!(
                             "{:?} is not compatible with {:?}",
-                            return_types, last_expr_types
+                            return_types, block_type
                         )));
                     }
                 }
@@ -100,16 +94,24 @@ fn compile_types(types: &Vec<String>) -> Vec<Type> {
 }
 
 fn visit_block(
-    exprs: &Vec<Box<StmtAst>>,
+    exprs: &Stmts,
     scope: &mut SymbolTable,
     mut module_builder: &mut ModuleBuilder,
 ) -> Result<Types, GearsError> {
     let mut local_scope = (&scope).push();
-    let mut last_type = vec![Type::new_none()];
 
-    for stmt in exprs {
-        last_type = visit_stmt(stmt, &mut local_scope, &mut module_builder)?;
+    for stmt in &exprs.0 {
+        visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
     }
+
+    let last_type = match exprs.1 {
+        Some(ref e) => visit_stmt(e.as_ref(), &mut local_scope, &mut module_builder)?,
+        None => {
+            module_builder.load_none();
+            vec![Type::new_none()]
+        }
+    };
+
     Ok(last_type)
 }
 
@@ -193,12 +195,8 @@ fn visit_expr(
             let else_block_types: HashSet<Type> = match else_exprs {
                 Some(exprs) => {
                     let jump_index = module_builder.start_else(jump_index);
-                    let mut local_scope = (&scope).push();
-                    let mut last_type = vec![Type::new_none()];
-                    for stmt in exprs {
-                        last_type =
-                            visit_stmt(stmt.as_ref(), &mut local_scope, &mut module_builder)?;
-                    }
+                    let mut last_type = visit_block(exprs, scope, &mut module_builder)?;
+
                     module_builder.end_jump(jump_index);
                     HashSet::from_iter(last_type)
                 }

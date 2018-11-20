@@ -97,14 +97,18 @@ FunctionReturn: Vec<Name> = {
 Args = Comma<Arg>;
 FnArgs = Comma<Expr>;
 Exprs = SemiColon<Expr>;
-Stmts = SemiColon<Statement>;
 Type = Pipe<Name>;
 
 Arg: ArgAst = {
     <name: Name> ":" <arg_type: Type> => ArgAst::new(<>)
 };
 
-Block: Vec<Box<StmtAst>> = {
+// If the Option is true, we ended without a SemiColon, else we ended with one
+Stmts: (Vec<Box<StmtAst>>, Option<Box<StmtAst>>) = {
+    <v:(<Statement> ";")*> <e:Statement?> => (v, e)
+};
+
+Block: (Vec<Box<StmtAst>>, Option<Box<StmtAst>>) = {
     "{" <stmts: Stmts> "}" => stmts
 };
 

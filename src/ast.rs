@@ -7,7 +7,7 @@ pub type Name = String;
 pub type Args = Vec<ArgAst>;
 pub type FnArgs = Vec<ExprAst>;
 pub type ListArgs = Vec<Box<ExprAst>>;
-pub type Stmts = Vec<Box<StmtAst>>;
+pub type Stmts = (Vec<Box<StmtAst>>, Option<Box<StmtAst>>);
 
 #[derive(Debug, Clone)]
 pub enum ModStmtAst {
