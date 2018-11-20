@@ -17,6 +17,10 @@ def main_args(a: int, b: int) -> int {
     12 * add(a + 4 - add_two(5), b) + 8
 }
 
+def returns_none(a: int, b: int) -> none {
+    4 + 5;
+}
+
 def sub(a: int, b: int) -> int {
     a - b
 }

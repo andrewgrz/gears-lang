@@ -1,14 +1,7 @@
 extern crate gears_lang;
-#[macro_use]
-extern crate cached;
-#[macro_use]
-extern crate lazy_static;
 
 use gears_lang::compiler::compile_str;
 use gears_lang::errors::*;
-use gears_lang::module::Module;
-use gears_lang::object::GearsObject;
-use gears_lang::vm::execute_function;
 
 #[test]
 fn bad_typing() {
@@ -20,6 +13,7 @@ fn bad_typing() {
         r#"def test() -> str { 1 }"#,
         r#"def test() -> bool { 1 }"#,
         r#"def test() -> list { 1 }"#,
+        r#"def add(a: int) -> int { 2 + a } def test() -> int { add(1); }"#,
     ];
 
     for (index, string) in strings.iter().enumerate() {

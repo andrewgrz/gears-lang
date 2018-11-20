@@ -21,7 +21,7 @@ cached!{
 fn function_calling() {
     assert_eq!(
         execute_function(&setup(), "expr_test", vec![]).unwrap(),
-        GearsObject::Int(5)
+        GearsObject::None
     );
 }
 
@@ -30,6 +30,18 @@ fn expr_in_call() {
     assert_eq!(
         execute_function(&setup(), "main_no_args", vec![]).unwrap(),
         GearsObject::Int(92)
+    );
+}
+
+#[test]
+fn returns_none() {
+    assert_eq!(
+        execute_function(
+            &setup(),
+            "returns_none",
+            vec![GearsObject::Int(1), GearsObject::Int(9)]
+        ).unwrap(),
+        GearsObject::None
     );
 }
 
