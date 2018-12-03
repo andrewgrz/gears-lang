@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate gears_lang;
 #[macro_use]
 extern crate cached;
@@ -7,8 +8,9 @@ extern crate lazy_static;
 use gears_lang::compiler::compile_file;
 use gears_lang::errors::*;
 use gears_lang::module::Module;
-use gears_lang::object::GearsObject;
+use gears_lang::object::{GearsObject, NONE_OBJ};
 use gears_lang::vm::execute_function;
+use std::sync::Arc;
 
 cached!{
     FIB;
@@ -21,7 +23,7 @@ cached!{
 fn function_calling() {
     assert_eq!(
         execute_function(&setup(), "expr_test", vec![]).unwrap(),
-        GearsObject::None
+        NONE_OBJ.clone()
     );
 }
 
@@ -29,37 +31,29 @@ fn function_calling() {
 fn expr_in_call() {
     assert_eq!(
         execute_function(&setup(), "main_no_args", vec![]).unwrap(),
-        GearsObject::Int(92)
+        gears_obj!(92)
     );
 }
 
 #[test]
 fn returns_none() {
     assert_eq!(
-        execute_function(
-            &setup(),
-            "returns_none",
-            vec![GearsObject::Int(1), GearsObject::Int(9)]
-        ).unwrap(),
-        GearsObject::None
+        execute_function(&setup(), "returns_none", vec![gears_obj!(1), gears_obj!(9)]).unwrap(),
+        NONE_OBJ.clone()
     );
 }
 
 #[test]
 fn pass_args() {
     assert_eq!(
-        execute_function(
-            &setup(),
-            "main_args",
-            vec![GearsObject::Int(1), GearsObject::Int(9)]
-        ).unwrap(),
-        GearsObject::Int(92)
+        execute_function(&setup(), "main_args", vec![gears_obj!(1), gears_obj!(9)]).unwrap(),
+        gears_obj!(92)
     );
 }
 
 #[test]
 fn pass_too_few_args() {
-    match execute_function(&setup(), "main_args", vec![GearsObject::Int(1)]) {
+    match execute_function(&setup(), "main_args", vec![gears_obj!(1)]) {
         Ok(_) => panic!("Should not have passed"),
         Err(error) => match error {
             GearsError::InterOpError { error, .. } => match error {
@@ -76,11 +70,7 @@ fn pass_too_many_args() {
     match execute_function(
         &setup(),
         "main_args",
-        vec![
-            GearsObject::Int(1),
-            GearsObject::Int(1),
-            GearsObject::Int(1),
-        ],
+        vec![gears_obj!(1), gears_obj!(1), gears_obj!(1)],
     ) {
         Ok(_) => panic!("Should not have passed"),
         Err(error) => match error {

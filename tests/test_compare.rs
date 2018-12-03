@@ -8,7 +8,7 @@ use gears_lang::compiler::compile_file;
 use gears_lang::module::Module;
 use gears_lang::object::GearsObject;
 use gears_lang::vm::execute_function;
-
+use std::sync::Arc;
 cached!{
     FIB;
     fn setup() -> Module = {
@@ -26,12 +26,12 @@ fn test_compare() {
     ];
 
     for row in test_set {
-        let a = GearsObject::from(row.0);
-        let b = GearsObject::from(row.1);
+        let a = Arc::new(GearsObject::from(row.0));
+        let b = Arc::new(GearsObject::from(row.1));
 
         assert_eq!(
             execute_function(&setup(), "compare_less", vec![a.clone(), b.clone()]).unwrap(),
-            GearsObject::Bool(row.2),
+            Arc::new(GearsObject::Bool(row.2)),
             "Compare Failed for: {} < {}",
             row.0,
             row.1
@@ -39,7 +39,7 @@ fn test_compare() {
 
         assert_eq!(
             execute_function(&setup(), "compare_less_eq", vec![a.clone(), b.clone()]).unwrap(),
-            GearsObject::Bool(row.3),
+            Arc::new(GearsObject::Bool(row.3)),
             "Compare Failed for: {} <= {}",
             row.0,
             row.1
@@ -47,7 +47,7 @@ fn test_compare() {
 
         assert_eq!(
             execute_function(&setup(), "compare_greater", vec![a.clone(), b.clone()]).unwrap(),
-            GearsObject::Bool(row.4),
+            Arc::new(GearsObject::Bool(row.4)),
             "Compare Failed for: {} > {}",
             row.0,
             row.1
@@ -55,7 +55,7 @@ fn test_compare() {
 
         assert_eq!(
             execute_function(&setup(), "compare_greater_eq", vec![a.clone(), b.clone()]).unwrap(),
-            GearsObject::Bool(row.5),
+            Arc::new(GearsObject::Bool(row.5)),
             "Compare Failed for: {} >= {}",
             row.0,
             row.1
@@ -63,7 +63,7 @@ fn test_compare() {
 
         assert_eq!(
             execute_function(&setup(), "compare_eq", vec![a.clone(), b.clone()]).unwrap(),
-            GearsObject::Bool(row.6),
+            Arc::new(GearsObject::Bool(row.6)),
             "Compare Failed for: {} == {}",
             row.0,
             row.1
@@ -71,7 +71,7 @@ fn test_compare() {
 
         assert_eq!(
             execute_function(&setup(), "compare_not_eq", vec![a.clone(), b.clone()]).unwrap(),
-            GearsObject::Bool(row.7),
+            Arc::new(GearsObject::Bool(row.7)),
             "Compare Failed for: {} != {}",
             row.0,
             row.1

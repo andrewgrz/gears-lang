@@ -1,9 +1,11 @@
+#[macro_use]
 extern crate gears_lang;
 
 use gears_lang::compiler::compile_file;
 use gears_lang::module::disassemble;
 use gears_lang::object::GearsObject;
 use gears_lang::vm::execute_function;
+use std::sync::Arc;
 
 #[test]
 fn assignment() {
@@ -11,7 +13,7 @@ fn assignment() {
 
     assert_eq!(
         execute_function(&module.expect("Test failure"), "assignment", vec![]).unwrap(),
-        GearsObject::Int(44)
+        gears_obj!(44)
     );
 }
 
@@ -21,7 +23,7 @@ fn return_assignment() {
 
     assert_eq!(
         execute_function(&module.expect("Test failure"), "return_assignment", vec![]).unwrap(),
-        GearsObject::Int(13)
+        gears_obj!(13)
     );
 }
 
@@ -33,6 +35,6 @@ fn reassignment() {
 
     assert_eq!(
         execute_function(&module, "reassign", vec![]).unwrap(),
-        GearsObject::Int(9)
+        gears_obj!(9)
     );
 }

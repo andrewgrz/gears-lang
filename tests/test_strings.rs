@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate gears_lang;
 #[macro_use]
 extern crate cached;
@@ -8,6 +9,7 @@ use gears_lang::compiler::compile_file;
 use gears_lang::module::Module;
 use gears_lang::object::GearsObject;
 use gears_lang::vm::execute_function;
+use std::sync::Arc;
 
 cached!{
     FIB;
@@ -20,6 +22,6 @@ cached!{
 fn return_string() {
     assert_eq!(
         execute_function(&setup(), "simple_string", vec![]).unwrap(),
-        GearsObject::from("simple string")
+        gears_obj!("simple string")
     );
 }
