@@ -1,7 +1,8 @@
 use errors::GearsError;
-use object::GearsObject;
+use object::{ArcGearsObject, GearsObject};
 use opcodes::*;
 use std::collections::HashMap;
+use std::sync::Arc;
 
 /// Contains a compiled module
 #[derive(Debug, Clone)]
@@ -9,7 +10,7 @@ pub struct Module {
     name: String,
     function_lookup: HashMap<String, usize>,
     functions: Vec<Function>,
-    consts: Vec<GearsObject>,
+    consts: Vec<ArcGearsObject>,
 }
 
 impl Module {
@@ -41,11 +42,11 @@ impl Module {
         }
     }
 
-    pub fn get_const(&self, index: usize) -> &GearsObject {
-        &self.consts[index]
+    pub fn get_const(&self, index: usize) -> ArcGearsObject {
+        self.consts[index].clone()
     }
 
-    fn insert_const(&mut self, new_value: GearsObject) -> usize {
+    fn insert_const(&mut self, new_value: ArcGearsObject) -> usize {
         for (index, constant) in self.consts.iter().enumerate() {
             if constant == &new_value {
                 return index;
@@ -58,13 +59,13 @@ impl Module {
     }
 
     fn insert_int(&mut self, number: i64) -> usize {
-        let new_value = GearsObject::Int(number);
+        let new_value = Arc::new(GearsObject::Int(number));
 
         self.insert_const(new_value)
     }
 
     fn insert_string(&mut self, string: String) -> usize {
-        let new_value = GearsObject::Str(string);
+        let new_value = Arc::new(GearsObject::Str(string));
 
         self.insert_const(new_value)
     }

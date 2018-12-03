@@ -1,6 +1,22 @@
 use errors::GearsError;
+use std::sync::Arc;
 
 pub type GearsResult = Result<GearsObject, GearsError>;
+pub type ArcGearsResult = Result<ArcGearsObject, GearsError>;
+pub type ArcGearsObject = Arc<GearsObject>;
+
+lazy_static! {
+    pub static ref TRUE_OBJ: ArcGearsObject = Arc::new(GearsObject::Bool(true));
+    pub static ref FALSE_OBJ: ArcGearsObject = Arc::new(GearsObject::Bool(false));
+    pub static ref NONE_OBJ: ArcGearsObject = Arc::new(GearsObject::None);
+}
+
+#[macro_export]
+macro_rules! gears_obj {
+    ($e:expr) => {{
+        Arc::new(GearsObject::from($e))
+    }};
+}
 
 fn create_type_error(op: &str, left: &GearsObject, right: &GearsObject) -> GearsError {
     GearsError::TypeError(format!(
@@ -35,7 +51,7 @@ pub enum GearsObject {
 }
 
 impl GearsObject {
-    pub fn inc(self) -> GearsResult {
+    pub fn inc(&self) -> GearsResult {
         use self::GearsObject::*;
 
         match self {
@@ -44,7 +60,7 @@ impl GearsObject {
         }
     }
 
-    pub fn add(self, other: GearsObject) -> GearsResult {
+    pub fn add(&self, other: &GearsObject) -> GearsResult {
         use self::GearsObject::*;
 
         match self {
@@ -60,7 +76,7 @@ impl GearsObject {
         }
     }
 
-    pub fn sub(self, other: GearsObject) -> GearsResult {
+    pub fn sub(&self, other: &GearsObject) -> GearsResult {
         use self::GearsObject::*;
 
         match self {
@@ -72,7 +88,7 @@ impl GearsObject {
         }
     }
 
-    pub fn mul(self, other: GearsObject) -> GearsResult {
+    pub fn mul(&self, other: &GearsObject) -> GearsResult {
         use self::GearsObject::*;
 
         match self {
@@ -84,7 +100,7 @@ impl GearsObject {
         }
     }
 
-    pub fn div(self, other: GearsObject) -> GearsResult {
+    pub fn div(&self, other: &GearsObject) -> GearsResult {
         use self::GearsObject::*;
 
         match self {
@@ -97,7 +113,7 @@ impl GearsObject {
     }
 
     #[inline]
-    fn _equal(self, other: GearsObject) -> bool {
+    fn _equal(&self, other: &GearsObject) -> bool {
         use self::GearsObject::*;
 
         match self {
@@ -117,16 +133,16 @@ impl GearsObject {
         }
     }
 
-    pub fn equal(self, other: GearsObject) -> GearsResult {
+    pub fn equal(&self, other: &GearsObject) -> GearsResult {
         Ok(GearsObject::Bool(self._equal(other)))
     }
 
-    pub fn nequal(self, other: GearsObject) -> GearsResult {
+    pub fn nequal(&self, other: &GearsObject) -> GearsResult {
         Ok(GearsObject::Bool(!self._equal(other)))
     }
 
     #[inline]
-    fn compare(self, other: GearsObject, dir: CompareDirection, op: &str) -> GearsResult {
+    fn compare(&self, other: &GearsObject, dir: CompareDirection, op: &str) -> GearsResult {
         use self::GearsObject::*;
 
         match self {
@@ -147,19 +163,19 @@ impl GearsObject {
         }
     }
 
-    pub fn less(self, other: GearsObject) -> GearsResult {
+    pub fn less(&self, other: &GearsObject) -> GearsResult {
         self.compare(other, CompareDirection::LessThan, "<")
     }
 
-    pub fn greater(self, other: GearsObject) -> GearsResult {
+    pub fn greater(&self, other: &GearsObject) -> GearsResult {
         self.compare(other, CompareDirection::GreaterThan, ">")
     }
 
-    pub fn less_eq(self, other: GearsObject) -> GearsResult {
+    pub fn less_eq(&self, other: &GearsObject) -> GearsResult {
         self.compare(other, CompareDirection::LessThanEqual, "<=")
     }
 
-    pub fn greater_eq(self, other: GearsObject) -> GearsResult {
+    pub fn greater_eq(&self, other: &GearsObject) -> GearsResult {
         self.compare(other, CompareDirection::GreaterThanEqual, ">=")
     }
 

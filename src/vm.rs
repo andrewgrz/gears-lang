@@ -1,10 +1,15 @@
 use errors::{GearsError, InterOpErrorType};
 use module::{Function, Module};
-use object::{GearsObject, GearsResult};
+use object::{ArcGearsObject, ArcGearsResult, FALSE_OBJ, NONE_OBJ, TRUE_OBJ};
 use opcodes::*;
+use std::sync::Arc;
 
 /// Execute a function contained in a compiled module
-pub fn execute_function(module: &Module, function: &str, args: Vec<GearsObject>) -> GearsResult {
+pub fn execute_function(
+    module: &Module,
+    function: &str,
+    args: Vec<ArcGearsObject>,
+) -> ArcGearsResult {
     let mod_fn = module.get_function(function)?;
     let num_given_args = args.len();
     let num_fn_args = mod_fn.num_args();
@@ -32,16 +37,16 @@ pub fn execute_function(module: &Module, function: &str, args: Vec<GearsObject>)
     execute(&mod_fn, &module, args)
 }
 
-fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> GearsResult {
+fn execute(function: &Function, module: &Module, mut args: Vec<ArcGearsObject>) -> ArcGearsResult {
     let opcodes = function.get_opcodes();
     let mut cur_instr: u8;
     let mut ip: usize = 0;
-    let mut stack: Vec<GearsObject> = Vec::new();
+    let mut stack: Vec<ArcGearsObject> = Vec::new();
 
     macro_rules! pop {
         () => {
             match stack.pop() {
-                Some(e) => e,
+                Some(e) => e.clone(),
                 None => {
                     return Err(GearsError::InternalCompilerError(
                         "Unexpected Empty Stack".to_string(),
@@ -59,16 +64,16 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
 
     macro_rules! bin_op {
         ($op:ident) => {{
-            let b = pop!();
-            let a = pop!();
-            push!(a.$op(b)?);
+            let b: ArcGearsObject = pop!();
+            let a: ArcGearsObject = pop!();
+            push!(Arc::new((*a).$op(&*b)?));
         }};
     }
 
     macro_rules! unary_op {
         ($op:ident) => {{
-            let a = pop!();
-            push!(a.$op()?);
+            let a: ArcGearsObject = pop!();
+            push!(Arc::new((*a).$op()?));
         }};
     }
 
@@ -123,7 +128,7 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
             }
             LOAD_CONST => {
                 advance!();
-                push!((*module.get_const(cur_instr as usize)).clone());
+                push!(module.get_const(cur_instr as usize).clone());
             }
             CALL_FUNCTION => {
                 advance!();
@@ -144,13 +149,13 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
                 )?);
             }
             LOAD_TRUE => {
-                push!(GearsObject::Bool(true));
+                push!(TRUE_OBJ.clone());
             }
             LOAD_FALSE => {
-                push!(GearsObject::Bool(false));
+                push!(FALSE_OBJ.clone());
             }
             LOAD_NONE => {
-                push!(GearsObject::None);
+                push!(NONE_OBJ.clone());
             }
             JUMP => {
                 advance!();
@@ -183,6 +188,7 @@ fn execute(function: &Function, module: &Module, mut args: Vec<GearsObject>) -> 
 mod tests {
     use super::*;
     use module::ModuleBuilder;
+    use object::GearsObject;
 
     #[test]
     fn test_addition() {
@@ -198,7 +204,7 @@ mod tests {
 
         let module = module_builder.build();
         let result = execute_function(&module, "simple_math", Vec::new());
-        assert_eq!(result, Ok(GearsObject::Int(15)));
+        assert_eq!(result, Ok(Arc::new(GearsObject::Int(15))));
     }
 
     #[test]
@@ -215,7 +221,7 @@ mod tests {
 
         let module = module_builder.build();
         let result = execute_function(&module, "simple_math", Vec::new());
-        assert_eq!(result, Ok(GearsObject::Int(11)));
+        assert_eq!(result, Ok(Arc::new(GearsObject::Int(11))));
     }
 
     #[test]
@@ -232,7 +238,7 @@ mod tests {
 
         let module = module_builder.build();
         let result = execute_function(&module, "simple_math", Vec::new());
-        assert_eq!(result, Ok(GearsObject::Int(60)));
+        assert_eq!(result, Ok(Arc::new(GearsObject::Int(60))));
     }
 
     #[test]
@@ -249,6 +255,6 @@ mod tests {
 
         let module = module_builder.build();
         let result = execute_function(&module, "simple_math", Vec::new());
-        assert_eq!(result, Ok(GearsObject::Int(2)));
+        assert_eq!(result, Ok(Arc::new(GearsObject::Int(2))));
     }
 }

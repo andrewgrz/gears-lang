@@ -1,5 +1,8 @@
 extern crate lalrpop_util;
 
+#[macro_use]
+extern crate lazy_static;
+
 mod ast;
 mod lexer;
 mod opcodes;
