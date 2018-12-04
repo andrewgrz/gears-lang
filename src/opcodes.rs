@@ -40,6 +40,9 @@ gen_opcodes!(
     // Misc Opcodes
     LOAD_CONST: 20,
 
+    // Iter Operations
+    BUILD_LIST: 25,
+
     // Loading and Storing
     LOAD_FAST: 30,
     STORE_FAST: 31,

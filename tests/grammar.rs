@@ -12,7 +12,8 @@ def example(a: int, b: int | bool) -> int | None {
     let b: int = a * 9;
     let c: int = sub(a - b);
     c = 12 * add(a + 4 - add_two(5), b) + c;
-    let d: int = [1, 2, 3 + 4 * 8 + b];
+    let d: [int] = [1, 2, 3 + 4 * 8 + b];
+    let g: [int | bool] = [1, 2, 3 + 4 * 8 + b, true];
 
     let d: bool = false;
     let e: bool = true;

@@ -44,6 +44,7 @@ extern {
         "let" => lexer::Token::Let,
         "true" => lexer::Token::True,
         "false" => lexer::Token::False,
+        "list" => lexer::Token::List,
     }
 }
 
@@ -97,7 +98,14 @@ FunctionReturn: Vec<Name> = {
 Args = Comma<Arg>;
 FnArgs = Comma<Expr>;
 Exprs = SemiColon<Expr>;
-Type = Pipe<Name>;
+
+BaseType = Pipe<Name>;
+ListType = "[" <BaseType> "]";
+
+Type: Vec<Name> = {
+    <BaseType>, 
+    <ListType>
+};
 
 Arg: ArgAst = {
     <name: Name> ":" <arg_type: Type> => ArgAst::new(<>)

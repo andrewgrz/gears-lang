@@ -77,6 +77,7 @@ pub enum Token {
     For,
     In,
     To,
+    List,
 }
 
 pub type Spanned<Token, Loc, Error> = Result<(Loc, Token, Loc), Error>;
@@ -209,6 +210,7 @@ pub fn lex(input: &str) -> Vec<Spanned<Token, Span, LexicalError>> {
                     "for" => token!(For, len),
                     "in" => token!(In, len),
                     "to" => token!(To, len),
+                    "list" => token!(List, len),
                     _ => token_data!(Token::Name(tmp), len),
                 }
 

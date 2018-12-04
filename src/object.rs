@@ -13,6 +13,16 @@ lazy_static! {
 
 #[macro_export]
 macro_rules! gears_obj {
+    ( list $( $x:expr ),* ) => {
+        {
+            let mut v = Vec::new();
+            $(
+                v.push(gears_obj!($x));
+            )*
+            Arc::new(GearsObject::from(v))
+        }
+    };
+
     ($e:expr) => {{
         Arc::new(GearsObject::from($e))
     }};
@@ -47,6 +57,7 @@ pub enum GearsObject {
     Str(String),
     Int(i64),
     Bool(bool),
+    List(Vec<ArcGearsObject>),
     None,
 }
 
@@ -129,6 +140,10 @@ impl GearsObject {
                 Str(r) => l == r,
                 _ => false,
             },
+            List(l) => match other {
+                List(r) => l == r,
+                _ => false,
+            },
             None => false,
         }
     }
@@ -186,6 +201,7 @@ impl GearsObject {
             Int(_) => "Integer",
             Bool(_) => "Bool",
             Str(_) => "String",
+            List(_) => "List",
             None => "NoneType",
         }
     }
@@ -197,6 +213,7 @@ impl GearsObject {
             Bool(b) => *b,
             Int(i) => *i != 0,
             Str(s) => s.len() > 0,
+            List(l) => l.len() > 0,
             None => false,
         }
     }
@@ -217,5 +234,11 @@ impl From<bool> for GearsObject {
 impl<'a> From<&'a str> for GearsObject {
     fn from(s: &str) -> GearsObject {
         GearsObject::Str(s.to_string())
+    }
+}
+
+impl From<Vec<ArcGearsObject>> for GearsObject {
+    fn from(v: Vec<ArcGearsObject>) -> GearsObject {
+        GearsObject::List(v)
     }
 }
